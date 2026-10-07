@@ -1,0 +1,691 @@
+<!doctype html>
+<html lang="ru">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>body{margin:0}</style>
+<title>Фикс Тайм</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@1,800&family=Tektur:wght@500;600&family=Unbounded:wght@300;500;700;800&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: белый «открытый космос» — герой с точечной планетой справа, сервисы сеткой, одна тёмная полоса гиперпрыжка, контакты по городам */
+:root{
+  --white:#ffffff;
+  --ice:#eef5ff;
+  --frost:#dbe9ff;
+  --sky:#5cc3ff;
+  --blue:#1f6bff;
+  --cobalt:#1446c9;
+  --ink:#0a1838;
+  --mute:#5a6a8e;
+  --deep:#050d2b;
+  --deep2:#0b1d5c;
+  --line:rgba(31,107,255,.14);
+  --f-display:"Unbounded","Segoe UI",system-ui,sans-serif;
+  --f-body:"Onest","Segoe UI",system-ui,sans-serif;
+  --f-tag:"Tektur","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --r:22px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--white);color:var(--ink);font:400 16px/1.6 var(--f-body);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:8px}
+.wrap{max-width:1200px;margin:0 auto;padding-inline:clamp(16px,4vw,40px)}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:-.01em}
+@property --ang{syntax:"<angle>";inherits:false;initial-value:0deg}
+.eyebrow{position:relative;display:inline-flex;align-items:center;gap:10px;padding:8px 16px 8px 9px;border-radius:999px;
+  font:500 13px/1 var(--f-tag);letter-spacing:.14em;text-transform:uppercase;color:var(--blue);
+  border:1px solid transparent;
+  background:linear-gradient(var(--white),var(--white)) padding-box,
+    conic-gradient(from var(--ang),rgba(92,195,255,.15),var(--sky) 20%,var(--blue) 30%,rgba(92,195,255,.15) 45%,rgba(92,195,255,.15)) border-box;
+  box-shadow:0 8px 24px -14px rgba(31,107,255,.6);animation:orbitb 5s linear infinite}
+@keyframes orbitb{to{--ang:360deg}}
+.eyebrow::before{content:"";flex:none;width:16px;height:16px;border-radius:50%;
+  background:radial-gradient(circle,var(--blue) 0 3px,transparent 3.5px),conic-gradient(var(--sky) 0 12%,transparent 12% 50%,var(--sky) 50% 62%,transparent 62%);
+  -webkit-mask:radial-gradient(circle,#000 0 3.5px,transparent 4px 6px,#000 6.5px);mask:radial-gradient(circle,#000 0 3.5px,transparent 4px 6px,#000 6.5px);
+  animation:spin2 3s linear infinite}
+@keyframes spin2{to{transform:rotate(360deg)}}
+.eyebrow .tt{background:linear-gradient(100deg,var(--cobalt) 0%,var(--blue) 35%,var(--sky) 50%,var(--blue) 65%,var(--cobalt) 100%);background-size:250% 100%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 6s linear infinite}
+.eyebrow .tt i{font-style:normal;color:var(--sky);-webkit-text-fill-color:var(--sky)}
+.eyebrow .cur{display:inline-block;width:.55em;height:1em;margin-left:4px;background:var(--sky);vertical-align:-2px;animation:caret 1s steps(1) infinite}
+@keyframes caret{50%{opacity:0}}
+@keyframes blink{50%{box-shadow:0 0 0 8px rgba(31,107,255,0),0 0 4px var(--sky)}}
+
+/* фон: звёздная пыль на всём сайте */
+#dust{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.layer{position:relative;z-index:1}
+
+/* курсор-свечение */
+#glow{position:fixed;left:0;top:0;width:520px;height:520px;margin:-260px 0 0 -260px;border-radius:50%;pointer-events:none;z-index:0;
+  background:radial-gradient(circle,rgba(92,195,255,.22),rgba(31,107,255,.06) 40%,transparent 68%);transition:opacity .4s;opacity:0}
+@media (pointer:fine){#glow{opacity:1}}
+
+/* шапка */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;padding-block:14px}
+.nav{display:flex;align-items:center;gap:20px;padding:10px 12px 10px 18px;border-radius:999px;
+  background:rgba(255,255,255,.72);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);
+  border:1px solid var(--line);box-shadow:0 10px 40px -18px rgba(20,70,201,.35)}
+.logo{display:flex;align-items:center;gap:10px;font:800 17px/1 var(--f-display);letter-spacing:.02em}
+.logo .ft-logo{width:108px;height:auto;flex:none;overflow:visible}
+.ft-sub{font:600 9.5px/1.35 var(--f-body);letter-spacing:.22em;color:var(--ink);text-transform:uppercase;padding-left:12px;border-left:1px solid var(--frost)}
+.ft-spark{stroke-dasharray:14 86;stroke-dashoffset:100;animation:spark 2.8s cubic-bezier(.6,0,.4,1) infinite;filter:drop-shadow(0 0 3px #5cc3ff)}
+@keyframes spark{0%{stroke-dashoffset:100;opacity:0}10%{opacity:1}80%{opacity:1}100%{stroke-dashoffset:0;opacity:0}}
+.logo:hover .ft-spark{animation-duration:.9s}
+@media (max-width:420px){.nav .ft-sub{display:none}}
+.links{display:flex;gap:4px;margin-left:auto}
+.links a{padding:9px 14px;border-radius:999px;font-weight:500;font-size:15px;color:var(--mute);transition:.25s}
+.links a:hover{color:var(--ink);background:var(--ice)}
+.city{display:flex;align-items:center;gap:8px;font:500 14px var(--f-mono);color:var(--mute);padding:9px 14px;border-radius:999px;background:var(--ice)}
+.city i{width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 10px #22c55e}
+.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:15px 26px;border-radius:999px;
+  font:600 15px/1 var(--f-body);white-space:nowrap;transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s,background .3s;isolation:isolate;overflow:hidden}
+.btn-primary{color:var(--white);background:linear-gradient(135deg,var(--blue),var(--cobalt));box-shadow:0 14px 34px -12px rgba(31,107,255,.7),inset 0 1px 0 rgba(255,255,255,.35)}
+.btn-primary::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.45) 50%,transparent 70%);transform:translateX(-120%);transition:transform .8s}
+.btn-primary:hover::after{transform:translateX(120%)}
+.btn-primary:hover{box-shadow:0 20px 44px -12px rgba(31,107,255,.85),inset 0 1px 0 rgba(255,255,255,.35)}
+.btn-ghost{background:var(--white);border:1px solid var(--frost);color:var(--ink)}
+.btn-ghost:hover{border-color:var(--sky);box-shadow:0 10px 30px -14px rgba(31,107,255,.5)}
+.btn svg{width:18px;height:18px}
+.nav .btn{padding:12px 20px}
+.burger{display:none;width:44px;height:44px;border-radius:50%;background:var(--ice);place-items:center}
+
+/* герой */
+.hero{padding-block:clamp(30px,6vw,70px) clamp(40px,6vw,80px)}
+.hero-grid{display:grid;grid-template-columns:1.05fr 1fr;gap:20px;align-items:center}
+.hero h1{font-size:clamp(38px,6.2vw,82px);line-height:.98;font-weight:800;margin-block:22px 24px}
+.hero h1 .line{display:block;overflow:hidden;padding-bottom:.06em}
+.hero h1 .line span{display:inline-block;animation:rise 1.1s cubic-bezier(.2,.9,.1,1) both}
+.hero h1 .line:nth-child(2) span{animation-delay:.12s}
+.hero h1 .line:nth-child(3) span{animation-delay:.24s}
+.hero h1 em{font-style:normal;background:linear-gradient(100deg,var(--blue) 10%,var(--sky) 45%,var(--blue) 80%);background-size:200% 100%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;animation:rise 1.1s .24s cubic-bezier(.2,.9,.1,1) both,shine 5s linear infinite}
+@keyframes rise{from{transform:translateY(105%) rotate(4deg)}}
+@keyframes shine{to{background-position:-200% 0}}
+.lead{font-size:clamp(17px,1.6vw,20px);color:var(--mute);max-width:30em;margin:0 0 34px;animation:fade 1s .5s both}
+@keyframes fade{from{opacity:0;transform:translateY(14px)}}
+.ctas{display:flex;flex-wrap:wrap;gap:12px;animation:fade 1s .65s both}
+.stats{display:flex;flex-wrap:wrap;gap:clamp(20px,4vw,44px);margin-top:46px;padding-top:26px;border-top:1px dashed var(--frost);animation:fade 1s .8s both}
+.stat b{display:block;font:700 30px/1 var(--f-display);color:var(--ink);font-variant-numeric:tabular-nums}
+.stat span{font:500 12px/1.4 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+
+.planet{position:relative;aspect-ratio:1;max-width:100%;width:100%}
+.planet canvas{position:absolute;inset:0;width:100%;height:100%;cursor:grab}
+.planet canvas:active{cursor:grabbing}
+.halo{position:absolute;inset:12%;border-radius:50%;background:radial-gradient(circle at 40% 35%,rgba(255,255,255,1),rgba(219,233,255,.9) 45%,rgba(92,195,255,.25) 70%,transparent 72%);filter:blur(2px)}
+.ring{position:absolute;inset:-2%;border-radius:50%;border:1px dashed rgba(31,107,255,.25);transform:rotateX(72deg) rotateZ(-18deg);pointer-events:none}
+.ring.r2{inset:8%;border-style:solid;border-color:rgba(92,195,255,.35);animation:spin 40s linear infinite}
+@keyframes spin{to{transform:rotateX(72deg) rotateZ(342deg)}}
+.chip{position:absolute;left:0;top:0;display:flex;align-items:center;gap:8px;padding:9px 14px 9px 10px;border-radius:999px;
+  background:rgba(255,255,255,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--frost);
+  box-shadow:0 12px 30px -14px rgba(20,70,201,.45);font:600 13px/1 var(--f-mono);white-space:nowrap;will-change:transform}
+.chip i{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--blue),var(--sky));color:#fff;font-style:normal;font-size:11px}
+.drag-hint{position:absolute;bottom:2%;left:50%;transform:translateX(-50%);font:500 11px var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mute);white-space:nowrap}
+
+/* бегущая строка */
+.ticker{border-block:1px solid var(--line);background:linear-gradient(90deg,var(--white),var(--ice),var(--white));overflow:hidden;padding-block:18px}
+.ticker-track{display:flex;gap:48px;width:max-content;animation:tick 38s linear infinite;font:500 clamp(18px,2.4vw,28px)/1 var(--f-display);color:var(--ink)}
+.ticker-track span{display:flex;align-items:center;gap:48px}
+.ticker-track span::after{content:"✦";color:var(--sky);font-size:.7em}
+@keyframes tick{to{transform:translateX(-50%)}}
+
+section{padding-block:clamp(70px,10vw,130px)}
+.head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:24px;margin-bottom:50px}
+.head h2{font-size:clamp(30px,4.4vw,56px);line-height:1.04;font-weight:700;margin-top:16px;max-width:14em}
+.head p{max-width:26em;color:var(--mute);margin:0}
+
+/* услуги */
+.services{display:grid;grid-template-columns:repeat(6,1fr);gap:18px}
+.card{position:relative;border-radius:var(--r);padding:30px;background:var(--white);border:1px solid var(--frost);overflow:hidden;
+  transition:transform .5s cubic-bezier(.2,.8,.2,1),box-shadow .5s,border-color .5s;transform-style:preserve-3d;min-width:0}
+.card::before{content:"";position:absolute;inset:0;background:radial-gradient(400px circle at var(--mx,50%) var(--my,0%),rgba(92,195,255,.18),transparent 60%);opacity:0;transition:opacity .4s}
+.card:hover{border-color:rgba(92,195,255,.7);box-shadow:0 30px 60px -30px rgba(20,70,201,.45)}
+.card:hover::before{opacity:1}
+.card>*{position:relative}
+.s-big{grid-column:span 3;min-height:340px;display:flex;flex-direction:column}
+.s-sm{grid-column:span 2}
+.card .ico{width:56px;height:56px;border-radius:16px;display:grid;place-items:center;background:var(--ice);color:var(--blue);margin-bottom:26px}
+.card .ico svg{width:28px;height:28px}
+.card h3{font-size:22px;font-weight:700;margin-bottom:10px}
+.card p{color:var(--mute);margin:0}
+.card .more{margin-top:auto;padding-top:28px;display:flex;align-items:center;gap:8px;font-weight:600;color:var(--blue)}
+.card .more svg{width:18px;transition:transform .3s}
+.card:hover .more svg{transform:translateX(6px)}
+.s-feature{background:linear-gradient(150deg,var(--blue),var(--cobalt) 70%);color:#fff;border:0}
+.s-feature p{color:rgba(255,255,255,.8)}
+.s-feature .ico{background:rgba(255,255,255,.16);color:#fff}
+.s-feature .more{color:#fff}
+.s-feature canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.9}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.tags span{font:500 12px var(--f-mono);padding:6px 10px;border-radius:999px;background:var(--ice);color:var(--cobalt)}
+.s-feature .tags span{background:rgba(255,255,255,.14);color:#fff}
+
+/* процесс */
+.process{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;position:relative}
+.process::before{content:"";position:absolute;left:4%;right:4%;top:31px;height:2px;background:repeating-linear-gradient(90deg,var(--frost) 0 8px,transparent 8px 16px)}
+.process .beam{position:absolute;left:4%;top:30px;height:4px;width:18%;border-radius:4px;background:linear-gradient(90deg,transparent,var(--sky),var(--blue));filter:drop-shadow(0 0 6px var(--sky));animation:beam 4.5s cubic-bezier(.6,0,.4,1) infinite}
+@keyframes beam{0%{left:2%;width:0;opacity:0}15%{opacity:1;width:18%}85%{opacity:1}100%{left:96%;width:0;opacity:0}}
+.step{position:relative;min-width:0}
+.step .dot{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:var(--white);border:1px solid var(--frost);
+  font:700 18px var(--f-display);color:var(--blue);box-shadow:0 10px 30px -12px rgba(31,107,255,.4);margin-bottom:24px}
+.step h3{font-size:18px;margin-bottom:8px}
+.step p{margin:0;color:var(--mute);font-size:15px}
+.step .time{display:inline-block;margin-top:14px;font:500 12px var(--f-mono);color:var(--cobalt);background:var(--ice);padding:5px 10px;border-radius:999px}
+
+/* сборки */
+.builds{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.build{border-radius:var(--r);border:1px solid var(--frost);background:var(--white);overflow:hidden;display:flex;flex-direction:column;transition:transform .5s cubic-bezier(.2,.8,.2,1),box-shadow .5s;min-width:0}
+.build:hover{transform:translateY(-8px);box-shadow:0 34px 60px -30px rgba(20,70,201,.5)}
+.case{position:relative;aspect-ratio:4/3;background:radial-gradient(circle at 50% 120%,var(--frost),var(--ice) 50%,var(--white));display:grid;place-items:center;overflow:hidden}
+.case svg{width:46%;height:auto;filter:drop-shadow(0 30px 30px rgba(20,70,201,.3));transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+.build:hover .case svg{transform:translateY(-8px) rotate(-3deg) scale(1.04)}
+.case .badge{position:absolute;top:16px;left:16px;font:600 11px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;padding:6px 10px;border-radius:999px;background:var(--white);color:var(--blue);border:1px solid var(--frost)}
+.fan{transform-origin:center;transform-box:fill-box;animation:fanspin 1.6s linear infinite}
+.build:hover .fan{animation-duration:.35s}
+@keyframes fanspin{to{transform:rotate(360deg)}}
+.build-body{padding:26px;display:flex;flex-direction:column;flex:1}
+.build-body h3{font-size:22px}
+.build-body .cls{font:500 13px var(--f-mono);color:var(--mute);margin:4px 0 18px}
+.spec{list-style:none;margin:0 0 22px;padding:0;display:grid;gap:10px;font-size:14.5px}
+.spec li{display:flex;justify-content:space-between;gap:12px;border-bottom:1px dashed var(--frost);padding-bottom:8px}
+.spec li span:first-child{font:500 12px var(--f-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--mute);padding-top:2px}
+.spec li span:last-child{text-align:right;font-weight:500}
+.fps{display:flex;align-items:center;gap:10px;font:500 12px var(--f-mono);color:var(--mute);margin-bottom:22px}
+.fps .bar{flex:1;height:6px;border-radius:6px;background:var(--ice);overflow:hidden}
+.fps .bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--sky),var(--blue))}
+.price{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.price b{font:700 24px var(--f-display);font-variant-numeric:tabular-nums}
+.price b small{font:500 13px var(--f-body);color:var(--mute);margin-right:4px}
+.note{font:500 12px var(--f-mono);color:var(--mute);margin-top:18px}
+
+/* гиперпрыжок */
+.warp{position:relative;margin-inline:clamp(8px,2vw,24px);border-radius:clamp(24px,4vw,44px);overflow:hidden;background:radial-gradient(ellipse at 50% 50%,var(--deep2),var(--deep) 70%);color:#fff;isolation:isolate}
+.warp canvas{position:absolute;inset:0;width:100%;height:100%;z-index:-1}
+.warp-inner{padding-block:clamp(80px,12vw,150px);text-align:center;display:flex;flex-direction:column;align-items:center}
+.warp .eyebrow{background:linear-gradient(rgba(5,13,43,.85),rgba(5,13,43,.85)) padding-box,conic-gradient(from var(--ang),rgba(92,195,255,.1),var(--sky) 20%,#fff 30%,rgba(92,195,255,.1) 45%,rgba(92,195,255,.1)) border-box}
+.warp .eyebrow .tt{background-image:linear-gradient(100deg,#9fd8ff 0%,#fff 50%,#9fd8ff 100%)}
+.warp h2{font-size:clamp(32px,5.6vw,72px);line-height:1;font-weight:800;margin:20px 0 22px;max-width:13em}
+.warp p{color:rgba(219,233,255,.78);max-width:34em;margin:0 0 36px;font-size:18px}
+.route{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-bottom:38px}
+.route span{font:500 13px var(--f-mono);padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(92,195,255,.25);color:#cfe6ff}
+.btn-warp{background:#fff;color:var(--deep);box-shadow:0 0 0 0 rgba(92,195,255,.6),0 20px 50px -10px rgba(92,195,255,.6)}
+.btn-warp:hover{box-shadow:0 0 0 10px rgba(92,195,255,.15),0 20px 60px -6px rgba(92,195,255,.9)}
+
+/* контакты */
+.contacts{display:grid;grid-template-columns:1fr 1.15fr;gap:18px}
+.cities{display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start}
+.cities button{padding:12px 18px;border-radius:999px;border:1px solid var(--frost);background:var(--white);font-weight:500;transition:.25s}
+.cities button:hover{border-color:var(--sky)}
+.cities button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink);box-shadow:0 10px 26px -10px rgba(10,24,56,.6)}
+.office{position:relative;border-radius:var(--r);border:1px solid var(--frost);background:linear-gradient(160deg,var(--white),var(--ice));padding:34px;overflow:hidden;min-width:0}
+.office h3{font-size:clamp(24px,3vw,34px);margin-bottom:26px}
+.office dl{display:grid;grid-template-columns:auto 1fr;gap:14px 26px;margin:0;position:relative}
+.office dt{font:500 12px var(--f-mono);text-transform:uppercase;letter-spacing:.1em;color:var(--mute);padding-top:3px}
+.office dd{margin:0;font-weight:500;font-size:17px}
+.office .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px;position:relative}
+.radar{position:absolute;right:-90px;bottom:-90px;width:300px;height:300px;border-radius:50%;
+  background:repeating-radial-gradient(circle,transparent 0 34px,rgba(31,107,255,.12) 34px 35px);pointer-events:none}
+.radar::after{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,rgba(92,195,255,.35),transparent 25%);animation:radar 4s linear infinite}
+@keyframes radar{to{transform:rotate(360deg)}}
+.swap{animation:swap .5s cubic-bezier(.2,.8,.2,1)}
+@keyframes swap{from{opacity:0;transform:translateY(10px);filter:blur(4px)}}
+.copied{font:500 12px var(--f-mono);color:var(--blue);align-self:center}
+
+/* FAQ */
+.faq{max-width:860px}
+.faq details{border-bottom:1px solid var(--frost)}
+.faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:24px 4px;font:500 clamp(17px,2vw,21px)/1.3 var(--f-display)}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary i{flex:none;width:36px;height:36px;border-radius:50%;background:var(--ice);position:relative;transition:.35s}
+.faq summary i::before,.faq summary i::after{content:"";position:absolute;left:50%;top:50%;width:14px;height:2px;margin:-1px 0 0 -7px;background:var(--blue);border-radius:2px;transition:.35s}
+.faq summary i::after{transform:rotate(90deg)}
+.faq details[open] summary i{background:var(--blue);transform:rotate(180deg)}
+.faq details[open] summary i::before,.faq details[open] summary i::after{background:#fff}
+.faq details[open] summary i::after{transform:rotate(0)}
+.faq details p{margin:0 0 24px;padding-inline:4px;color:var(--mute);max-width:60ch}
+
+footer{border-top:1px solid var(--line);padding-block:40px;color:var(--mute);font-size:14px}
+.foot{display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;align-items:center}
+
+/* появление при прокрутке — только где браузер умеет, без скрытого состояния */
+@supports (animation-timeline:view()){
+  .reveal{animation:up linear both;animation-timeline:view();animation-range:entry 0% entry 60%}
+  @keyframes up{from{transform:translateY(50px) scale(.97);opacity:.35}}
+}
+
+@media (max-width:980px){
+  .links,.city{display:none}
+  .burger{display:grid;margin-left:auto}
+  .nav .btn{display:none}
+  .hero-grid{grid-template-columns:1fr}
+  .planet{max-width:540px;margin:0 auto;order:-1;width:92%}
+  .s-big,.s-sm{grid-column:span 6}
+  .process{grid-template-columns:1fr 1fr;gap:34px 18px}
+  .process::before,.process .beam{display:none}
+  .builds{grid-template-columns:1fr}
+  .contacts{grid-template-columns:1fr}
+}
+@media (min-width:640px) and (max-width:980px){.s-sm{grid-column:span 3}.builds{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){
+  .process{grid-template-columns:1fr}
+  .ctas .btn{width:100%}
+  .office{padding:24px}
+  .office dl{grid-template-columns:1fr;gap:4px}
+  .office dd{margin-bottom:12px}
+  .chip{font-size:11px;padding:7px 11px 7px 8px}
+  .chip i{width:22px;height:22px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+}
+</style>
+
+<canvas id="dust" aria-hidden="true"></canvas>
+<div id="glow" aria-hidden="true"></div>
+
+<div class="layer">
+<header>
+  <div class="wrap">
+    <nav class="nav" aria-label="Основное меню">
+      <a class="logo" href="#top" aria-label="Фикс Тайм, на главную">
+        <svg class="ft-logo" viewBox="0 0 200 92" aria-hidden="true">
+          <defs>
+            <linearGradient id="ftBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f7bff"/><stop offset="1" stop-color="#1446c9"/></linearGradient>
+            <linearGradient id="ftWire" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1f6bff"/><stop offset=".75" stop-color="#1446c9"/><stop offset="1" stop-color="#0a1838"/></linearGradient>
+          </defs>
+          <g id="ftMark">
+          <text x="4" y="36" font-family="'Exo 2',Onest,sans-serif" font-style="italic" font-weight="800" font-size="40" fill="#0a1838" letter-spacing="-1">Фикс</text>
+          <circle cx="12" cy="47" r="5" fill="#fff" stroke="#1f6bff" stroke-width="3"/>
+          <path d="M17 47H172" stroke="url(#ftWire)" stroke-width="3.2"/>
+          <path class="ft-spark" d="M17 47H172" stroke="#5cc3ff" stroke-width="3.2" stroke-linecap="round" pathLength="100"/>
+          <path d="M172 41h8l3 3v6l-3 3h-8z" fill="#0a1838"/>
+          <rect x="184" y="39" width="10" height="16" rx="2" fill="#0a1838"/>
+          <text x="58" y="86" font-family="'Exo 2',Onest,sans-serif" font-style="italic" font-weight="800" font-size="40" fill="url(#ftBlue)" letter-spacing="-1">Тайм</text>
+          </g>
+        </svg>
+        <small class="ft-sub">компьютерная<br>мастерская</small>
+      </a>
+      <div class="links">
+        <a href="#services">Услуги</a>
+        <a href="#builds">Сборки</a>
+        <a href="#repair">Ремонт</a>
+        <a href="#faq">FAQ</a>
+        <a href="#contacts">Контакты</a>
+      </div>
+      <span class="city"><i></i>Калининград</span>
+      <a class="btn btn-primary" href="#contacts">Позвонить</a>
+      <button class="burger" aria-label="Открыть меню"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0a1838" stroke-width="2" stroke-linecap="round"><path d="M4 8h16M4 16h10"/></svg></button>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow">Ремонт · апгрейд · сборка с 2018 года</span>
+        <h1>
+          <span class="line"><span>Мастерская</span></span>
+          <span class="line"><span>счастливых</span></span>
+          <span class="line"><em>компьютеров</em></span>
+        </h1>
+        <p class="lead">Ремонтируем, прокачиваем и собираем компьютеры по всей России. Каждую сборку гоняем стресс-тестом, прежде чем она уйдёт к вам.</p>
+        <div class="ctas">
+          <a class="btn btn-primary magnet" href="#builds">Собрать ПК под заказ
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          <a class="btn btn-ghost magnet" href="#builds">Компьютеры в продаже</a>
+          <a class="btn btn-ghost magnet" href="#repair">Отправить на ремонт</a>
+        </div>
+        <div class="stats">
+          <div class="stat"><b data-count="2018">2018</b><span>работаем с</span></div>
+          <div class="stat"><b data-count="8">8</b><span>городов</span></div>
+          <div class="stat"><b>10–19</b><span>ежедневно</span></div>
+        </div>
+      </div>
+      <div class="planet" id="planet">
+        <div class="halo"></div>
+        <div class="ring"></div>
+        <div class="ring r2"></div>
+        <canvas id="globe" aria-label="Вращающаяся планета из точек, её можно крутить мышью" role="img"></canvas>
+        <div class="chip" data-orbit="0"><i>CPU</i>Ryzen 7 9800X3D</div>
+        <div class="chip" data-orbit="1"><i>GPU</i>RTX 5070</div>
+        <div class="chip" data-orbit="2"><i>SSD</i>2 ТБ NVMe</div>
+        <div class="chip" data-orbit="3"><i>°C</i>62° под нагрузкой</div>
+        <span class="drag-hint">потяните планету</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track">
+      <span>Сборка под заказ</span><span>Замена термопасты</span><span>Апгрейд видеокарты</span><span>Восстановление данных</span><span>Чистка от пыли</span><span>Установка Windows</span><span>Ремонт ноутбуков</span><span>Водяное охлаждение</span>
+      <span>Сборка под заказ</span><span>Замена термопасты</span><span>Апгрейд видеокарты</span><span>Восстановление данных</span><span>Чистка от пыли</span><span>Установка Windows</span><span>Ремонт ноутбуков</span><span>Водяное охлаждение</span>
+    </div>
+  </div>
+
+  <section id="services">
+    <div class="wrap">
+      <div class="head reveal">
+        <div><span class="eyebrow">Что мы делаем</span><h2>Всё, что нужно компьютеру, в одной мастерской</h2></div>
+        <p>Приносите в мастерскую или отправляйте транспортной компанией. Диагностика бесплатная, если делаете ремонт у нас.</p>
+      </div>
+      <div class="services">
+        <article class="card s-big s-feature tilt reveal">
+          <canvas class="mini-stars" aria-hidden="true"></canvas>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><circle cx="12" cy="14" r="3"/><path d="M9 6h6"/></svg></div>
+          <h3>Сборка ПК под заказ</h3>
+          <p>Подберём железо под ваши игры, монтаж или работу и уложимся в бюджет. Кабель-менеджмент, тихие кулеры, подсветка по желанию.</p>
+          <div class="tags"><span>игровые</span><span>для монтажа</span><span>для офиса</span><span>белые сборки</span></div>
+          <a class="more" href="#builds">Собрать свой <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        </article>
+        <article class="card s-big tilt reveal">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg></div>
+          <h3>Ремонт и диагностика</h3>
+          <p>Не включается, перегревается, шумит, выключается в играх. Найдём причину, скажем цену до начала работ и дадим гарантию на ремонт.</p>
+          <div class="tags"><span>ПК</span><span>ноутбуки</span><span>моноблоки</span><span>видеокарты</span></div>
+          <a class="more" href="#repair">Отправить на ремонт <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        </article>
+        <article class="card s-sm tilt reveal">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div>
+          <h3>Апгрейд</h3>
+          <p>Меняем видеокарту, процессор, память, ставим SSD. Старое железо можно сдать в зачёт.</p>
+        </article>
+        <article class="card s-sm tilt reveal">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/><circle cx="12" cy="12" r="3"/></svg></div>
+          <h3>Чистка и обслуживание</h3>
+          <p>Пыль, новая термопаста и термопрокладки. Обычно минус 10–20 °C на процессоре.</p>
+        </article>
+        <article class="card s-sm tilt reveal">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></div>
+          <h3>Данные и система</h3>
+          <p>Восстановим файлы с умершего диска, перенесём систему на новый SSD, поставим Windows и драйверы.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="wrap">
+      <div class="head reveal">
+        <div><span class="eyebrow">Как проходит сборка</span><h2>От заявки до первого запуска</h2></div>
+      </div>
+      <div class="process reveal">
+        <div class="beam" aria-hidden="true"></div>
+        <div class="step"><div class="dot">1</div><h3>Заявка</h3><p>Пишете, во что играете или в чём работаете, и сколько готовы потратить.</p><span class="time">15 минут</span></div>
+        <div class="step"><div class="dot">2</div><h3>Подбор</h3><p>Присылаем две-три конфигурации с ценами и честно говорим, где можно сэкономить.</p><span class="time">в тот же день</span></div>
+        <div class="step"><div class="dot">3</div><h3>Сборка и тест</h3><p>Собираем, укладываем кабели, гоняем стресс-тест и присылаем видео с температурами.</p><span class="time">1–3 дня</span></div>
+        <div class="step"><div class="dot">4</div><h3>Доставка</h3><p>Забираете в мастерской или получаете транспортной компанией в любом городе.</p><span class="time">по всей России</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="builds" style="background:linear-gradient(180deg,transparent,var(--ice) 30%,var(--ice) 70%,transparent)">
+    <div class="wrap">
+      <div class="head reveal">
+        <div><span class="eyebrow">Компьютеры в продаже</span><h2>Готовые сборки, уже прошли стресс-тест</h2></div>
+        <p>Можно забрать сегодня. Любую сборку поменяем под вас: память, диск, корпус, цвет.</p>
+      </div>
+      <div class="builds">
+        <article class="build reveal">
+          <div class="case"><span class="badge">в наличии</span>
+            <svg viewBox="0 0 120 160" aria-hidden="true"><rect x="10" y="6" width="100" height="148" rx="10" fill="#fff" stroke="#bcd4ff" stroke-width="2"/><rect x="20" y="16" width="56" height="128" rx="6" fill="#eef5ff"/><g class="fan"><circle cx="48" cy="48" r="20" fill="none" stroke="#5cc3ff" stroke-width="3"/><path d="M48 48l0-16M48 48l14 8M48 48l-14 8" stroke="#1f6bff" stroke-width="5" stroke-linecap="round"/></g><g class="fan"><circle cx="48" cy="104" r="20" fill="none" stroke="#5cc3ff" stroke-width="3"/><path d="M48 104l0-16M48 104l14 8M48 104l-14 8" stroke="#1f6bff" stroke-width="5" stroke-linecap="round"/></g><rect x="84" y="20" width="16" height="4" rx="2" fill="#1f6bff"/><circle cx="92" cy="140" r="4" fill="#5cc3ff"/></svg>
+          </div>
+          <div class="build-body">
+            <h3>Пульсар</h3><div class="cls">Full HD · киберспорт и учёба</div>
+            <ul class="spec"><li><span>CPU</span><span>Ryzen 5 7500F</span></li><li><span>GPU</span><span>RTX 5060 8 ГБ</span></li><li><span>RAM</span><span>32 ГБ DDR5</span></li><li><span>SSD</span><span>1 ТБ NVMe</span></li></ul>
+            <div class="fps"><span>CS2</span><span class="bar"><i style="width:72%"></i></span><span>~300 fps</span></div>
+            <div class="price"><b><small>от</small>89 900 ₽</b><a class="btn btn-ghost" href="#contacts">Хочу</a></div>
+          </div>
+        </article>
+        <article class="build reveal">
+          <div class="case"><span class="badge">хит</span>
+            <svg viewBox="0 0 120 160" aria-hidden="true"><rect x="10" y="6" width="100" height="148" rx="10" fill="#fff" stroke="#1f6bff" stroke-width="2"/><rect x="20" y="16" width="56" height="128" rx="6" fill="#dbe9ff"/><g class="fan"><circle cx="48" cy="40" r="17" fill="none" stroke="#1f6bff" stroke-width="3"/><path d="M48 40l0-13M48 40l11 7M48 40l-11 7" stroke="#5cc3ff" stroke-width="5" stroke-linecap="round"/></g><g class="fan"><circle cx="48" cy="80" r="17" fill="none" stroke="#1f6bff" stroke-width="3"/><path d="M48 80l0-13M48 80l11 7M48 80l-11 7" stroke="#5cc3ff" stroke-width="5" stroke-linecap="round"/></g><g class="fan"><circle cx="48" cy="120" r="17" fill="none" stroke="#1f6bff" stroke-width="3"/><path d="M48 120l0-13M48 120l11 7M48 120l-11 7" stroke="#5cc3ff" stroke-width="5" stroke-linecap="round"/></g><rect x="84" y="20" width="16" height="4" rx="2" fill="#5cc3ff"/><circle cx="92" cy="140" r="4" fill="#1f6bff"/></svg>
+          </div>
+          <div class="build-body">
+            <h3>Квазар</h3><div class="cls">2K · новые игры на высоких</div>
+            <ul class="spec"><li><span>CPU</span><span>Ryzen 7 9700X</span></li><li><span>GPU</span><span>RTX 5070 12 ГБ</span></li><li><span>RAM</span><span>32 ГБ DDR5 6000</span></li><li><span>SSD</span><span>2 ТБ NVMe</span></li></ul>
+            <div class="fps"><span>Cyberpunk</span><span class="bar"><i style="width:84%"></i></span><span>~100 fps</span></div>
+            <div class="price"><b><small>от</small>154 900 ₽</b><a class="btn btn-primary" href="#contacts">Хочу</a></div>
+          </div>
+        </article>
+        <article class="build reveal">
+          <div class="case"><span class="badge">под заказ</span>
+            <svg viewBox="0 0 120 160" aria-hidden="true"><rect x="10" y="6" width="100" height="148" rx="10" fill="#0a1838" stroke="#1f6bff" stroke-width="2"/><rect x="20" y="16" width="80" height="128" rx="6" fill="#0b1d5c"/><g class="fan"><circle cx="60" cy="50" r="24" fill="none" stroke="#5cc3ff" stroke-width="3"/><path d="M60 50l0-19M60 50l16 10M60 50l-16 10" stroke="#5cc3ff" stroke-width="6" stroke-linecap="round"/></g><rect x="30" y="92" width="60" height="12" rx="3" fill="#1f6bff"/><rect x="30" y="112" width="60" height="6" rx="3" fill="#5cc3ff" opacity=".6"/><circle cx="96" cy="140" r="4" fill="#5cc3ff"/></svg>
+          </div>
+          <div class="build-body">
+            <h3>Сверхновая</h3><div class="cls">4K · стримы и монтаж</div>
+            <ul class="spec"><li><span>CPU</span><span>Ryzen 7 9800X3D</span></li><li><span>GPU</span><span>RTX 5080 16 ГБ</span></li><li><span>RAM</span><span>64 ГБ DDR5 6000</span></li><li><span>SSD</span><span>4 ТБ NVMe</span></li></ul>
+            <div class="fps"><span>4K Ultra</span><span class="bar"><i style="width:94%"></i></span><span>~120 fps</span></div>
+            <div class="price"><b><small>от</small>289 900 ₽</b><a class="btn btn-ghost" href="#contacts">Хочу</a></div>
+          </div>
+        </article>
+      </div>
+      <p class="note">* В макете цены и FPS для примера, подставьте свои.</p>
+    </div>
+  </section>
+
+  <section id="repair" style="padding-block:0">
+    <div class="warp">
+      <canvas id="warp" aria-hidden="true"></canvas>
+      <div class="wrap warp-inner">
+        <span class="eyebrow">Ремонт по всей России</span>
+        <h2>Живёте в другом городе? Отправьте компьютер к нам</h2>
+        <p>Упакуйте ПК или ноутбук, сдайте в транспортную компанию, и мы заберём его со склада. Вернём тем же путём, уже исправным.</p>
+        <div class="route"><span>вы оставляете заявку</span><span>→ сдаёте в ТК</span><span>→ диагностика и цена</span><span>→ ремонт</span><span>→ обратно к вам</span></div>
+        <a class="btn btn-warp" id="warpBtn" href="#contacts">Отправить на ремонт
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </div>
+  </section>
+
+  <section id="contacts">
+    <div class="wrap">
+      <div class="head reveal">
+        <div><span class="eyebrow">Контакты</span><h2>Восемь мастерских, выберите свою</h2></div>
+      </div>
+      <div class="contacts reveal">
+        <div class="cities" id="cities" role="group" aria-label="Город"></div>
+        <div class="office" id="office" aria-live="polite">
+          <div class="radar" aria-hidden="true"></div>
+          <div id="officeBody"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" style="padding-top:0">
+    <div class="wrap">
+      <div class="head reveal"><div><span class="eyebrow">Частые вопросы</span><h2>Спрашивают чаще всего</h2></div></div>
+      <div class="faq">
+        <details open><summary>Сколько стоит диагностика?<i></i></summary><p>Бесплатно, если ремонт делаете у нас. Если решите не ремонтировать, диагностика оплачивается по прайсу мастерской.</p></details>
+        <details><summary>Какая гарантия на сборку?<i></i></summary><p>На комплектующие действует гарантия производителя, на саму сборку и работу даём свою. Если что-то случится, разбираемся мы, а не вы с магазинами.</p></details>
+        <details><summary>Можно собрать ПК из моих комплектующих?<i></i></summary><p>Да. Проверим совместимость, соберём, обновим BIOS и прогоним стресс-тест.</p></details>
+        <details><summary>Как отправить компьютер из другого города?<i></i></summary><p>Оставьте заявку, и мы подскажем, как упаковать и в какую транспортную компанию сдать. Доставку туда и обратно можно оплатить при получении.</p></details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span class="logo"><svg class="ft-logo" viewBox="0 0 200 92" aria-hidden="true"><use href="#ftMark"/></svg><small class="ft-sub">компьютерная мастерская<br>с 2018 года</small></span>
+    <span>Ремонт, апгрейд и сборка компьютеров по всей России</span>
+  </div>
+</footer>
+</div>
+
+<script>
+(()=>{
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const DPR = Math.min(devicePixelRatio||1, 2);
+const fit = c => { const r=c.getBoundingClientRect(); c.width=Math.max(1,r.width*DPR); c.height=Math.max(1,r.height*DPR); return r; };
+const visible = new WeakMap();
+const io = 'IntersectionObserver' in window ? new IntersectionObserver(es=>es.forEach(e=>visible.set(e.target,e.isIntersecting))) : null;
+const watch = el => { visible.set(el,true); io && io.observe(el); };
+
+/* ---------- курсор ---------- */
+const glow = document.getElementById('glow');
+let mx=innerWidth/2,my=innerHeight/3,gx=mx,gy=my;
+addEventListener('pointermove',e=>{mx=e.clientX;my=e.clientY},{passive:true});
+
+/* ---------- звёздная пыль на фоне ---------- */
+const dust = document.getElementById('dust'), dctx = dust.getContext('2d');
+let stars=[];
+function initDust(){ fit(dust); const n=Math.round(innerWidth*innerHeight/9000);
+  stars=Array.from({length:n},()=>({x:Math.random(),y:Math.random(),z:Math.random()*0.9+0.1,t:Math.random()*6.28}));}
+initDust();
+
+/* ---------- планета из точек ---------- */
+const gc=document.getElementById('globe'), g=gc.getContext('2d'), planet=document.getElementById('planet');
+watch(planet);
+const N=1100, pts=[];
+for(let i=0;i<N;i++){ const y=1-(i/(N-1))*2, r=Math.sqrt(1-y*y), th=i*2.39996;
+  pts.push({x:Math.cos(th)*r,y,z:Math.sin(th)*r,sx:(Math.random()-.5)*6,sy:(Math.random()-.5)*6,sz:(Math.random()-.5)*6,land:0}); }
+// «континенты» — шумом по сфере
+pts.forEach(p=>{ const v=Math.sin(p.x*3.1+1)*Math.cos(p.y*2.7)+Math.sin(p.z*4.2-p.x*1.3)*.8; p.land=v>.35?1:0; });
+const ringPts=Array.from({length:260},(_,i)=>({a:Math.random()*6.283,r:1.45+Math.random()*.38,s:.6+Math.random()*.8}));
+let rotY=0, rotX=-.35, vy=.0035, dragging=false, lx=0, ly=0, born=performance.now();
+gc.addEventListener('pointerdown',e=>{dragging=true;lx=e.clientX;ly=e.clientY;gc.setPointerCapture(e.pointerId)});
+gc.addEventListener('pointermove',e=>{ if(!dragging)return; vy=(e.clientX-lx)*.0009; rotX=Math.max(-1.1,Math.min(.6,rotX+(e.clientY-ly)*.004)); lx=e.clientX;ly=e.clientY;});
+addEventListener('pointerup',()=>dragging=false);
+let gr=fit(gc);
+const chips=[...planet.querySelectorAll('.chip')];
+const ease=t=>1-Math.pow(1-t,4);
+
+function drawGlobe(now){
+  const W=gc.width,H=gc.height,cx=W/2,cy=H/2,R=Math.min(W,H)*.3;
+  g.clearRect(0,0,W,H);
+  const k=reduce?1:ease(Math.min(1,(now-born)/2200));
+  if(!dragging) vy+=(.0035-vy)*.02;
+  rotY+=reduce?0:vy;
+  const cY=Math.cos(rotY),sY=Math.sin(rotY),cX=Math.cos(rotX),sX=Math.sin(rotX);
+  // кольцо за планетой и перед ней
+  const ringDraw=front=>{ for(const q of ringPts){ const a=q.a+(reduce?0:now*.00012*q.s);
+      let x=Math.cos(a)*q.r, z=Math.sin(a)*q.r, y=0;
+      let x1=x*cY-z*sY, z1=x*sY+z*cY; let y2=y*cX-z1*sX, z2=y*sX+z1*cX;
+      // наклон кольца
+      const tl=-.32, xr=x1*Math.cos(tl)-y2*Math.sin(tl), yr=x1*Math.sin(tl)+y2*Math.cos(tl);
+      if((z2>0)!==front) continue;
+      g.fillStyle=`rgba(31,107,255,${(.25+(z2+1.8)/3.6*.5)*k})`;
+      g.beginPath(); g.arc(cx+xr*R*k, cy+yr*R*k, (1.1+q.s*.6)*DPR, 0, 6.283); g.fill(); } };
+  ringDraw(false);
+  for(const p of pts){
+    let x=p.x,y=p.y,z=p.z;
+    x=x*k+p.sx*(1-k); y=y*k+p.sy*(1-k); z=z*k+p.sz*(1-k);
+    let x1=x*cY-z*sY, z1=x*sY+z*cY; let y2=y*cX-z1*sX, z2=y*sX+z1*cX;
+    const d=(z2+1.4)/2.8; if(d<0) continue;
+    const persp=1.9/(2.6-z2*.5);
+    const px=cx+x1*R*persp, py=cy+y2*R*persp;
+    const a=Math.max(.05,Math.min(1,d))*(p.land?1:.45);
+    g.fillStyle=p.land?`rgba(20,70,201,${a})`:`rgba(92,195,255,${a})`;
+    g.beginPath(); g.arc(px,py,(p.land?1.9:1.3)*DPR*persp,0,6.283); g.fill();
+  }
+  ringDraw(true);
+  // спутники-чипы
+  const pw=gr.width, ph=gr.height;
+  chips.forEach((c,i)=>{ const a=(reduce?0:now*.00022)+i*1.5708, rx=pw*.43, ry=ph*.15;
+    const x=Math.cos(a)*rx, y=Math.sin(a)*ry + (i%2?-1:1)*ph*.12, z=Math.sin(a);
+    const s=.82+z*.18;
+    c.style.transform=`translate(${pw/2+x-c.offsetWidth/2}px,${ph/2+y-c.offsetHeight/2}px) scale(${s})`;
+    c.style.zIndex=z>0?3:0; c.style.opacity=k*(.55+(z+1)*.225); });
+}
+
+/* ---------- мини-звёзды в карточке ---------- */
+const minis=[...document.querySelectorAll('.mini-stars')].map(c=>{watch(c);fit(c);
+  return {c,x:c.getContext('2d'),s:Array.from({length:70},()=>({x:Math.random(),y:Math.random(),v:.2+Math.random()*.8,r:Math.random()*1.4+.3}))};});
+function drawMinis(t){ for(const m of minis){ if(!visible.get(m.c))continue; const {c,x}=m,W=c.width,H=c.height; x.clearRect(0,0,W,H);
+  for(const s of m.s){ s.x-=s.v*.0006; if(s.x<0){s.x=1;s.y=Math.random();}
+    x.fillStyle=`rgba(255,255,255,${.3+.5*Math.abs(Math.sin(t*.001*s.v+s.y*9))})`; x.beginPath(); x.arc(s.x*W,s.y*H,s.r*DPR,0,6.283); x.fill(); } } }
+
+/* ---------- гиперпрыжок ---------- */
+const wc=document.getElementById('warp'), w=wc.getContext('2d'); watch(wc); fit(wc);
+const WS=Array.from({length:420},()=>({x:(Math.random()-.5)*2,y:(Math.random()-.5)*2,z:Math.random(),pz:0}));
+let speed=.004, target=.004, wmx=0, wmy=0;
+const wb=document.getElementById('warpBtn');
+wb.addEventListener('pointerenter',()=>target=.045); wb.addEventListener('pointerleave',()=>target=.004);
+wb.addEventListener('focus',()=>target=.045); wb.addEventListener('blur',()=>target=.004);
+wc.parentElement.addEventListener('pointermove',e=>{const r=wc.getBoundingClientRect();wmx=(e.clientX-r.left)/r.width-.5;wmy=(e.clientY-r.top)/r.height-.5;});
+function drawWarp(){ if(!visible.get(wc))return; const W=wc.width,H=wc.height; speed+=(target-speed)*.05;
+  w.fillStyle=`rgba(5,13,43,${speed>.01?.35:.9})`; w.fillRect(0,0,W,H);
+  const cx=W/2-wmx*W*.15, cy=H/2-wmy*H*.15, F=Math.max(W,H)*.5;
+  for(const s of WS){ s.pz=s.z; s.z-=reduce?0:speed; if(s.z<=.01){s.z=1;s.pz=1;s.x=(Math.random()-.5)*2;s.y=(Math.random()-.5)*2;}
+    const x=cx+s.x/s.z*F*.5, y=cy+s.y/s.z*F*.5, px=cx+s.x/s.pz*F*.5, py=cy+s.y/s.pz*F*.5;
+    const b=1-s.z; w.strokeStyle=b>.6?`rgba(255,255,255,${b})`:`rgba(92,195,255,${b})`; w.lineWidth=Math.max(.6,b*2.6)*DPR;
+    w.beginPath(); w.moveTo(px,py); w.lineTo(x,y); w.stroke(); } }
+
+/* ---------- главный цикл ---------- */
+function frame(t){
+  gx+=(mx-gx)*.12; gy+=(my-gy)*.12; glow.style.transform=`translate(${gx}px,${gy}px)`;
+  const W=dust.width,H=dust.height; dctx.clearRect(0,0,W,H);
+  const ox=(gx/innerWidth-.5), oy=(gy/innerHeight-.5), sc=scrollY;
+  for(const s of stars){ let x=(s.x*W - ox*40*s.z*DPR), y=((s.y*H - sc*s.z*.25*DPR - oy*40*s.z*DPR)%H+H)%H;
+    const a=.25+.45*Math.abs(Math.sin(t*.0008+s.t)); dctx.fillStyle=`rgba(31,107,255,${a*s.z})`;
+    dctx.beginPath(); dctx.arc(x,y,s.z*1.5*DPR,0,6.283); dctx.fill(); }
+  if(visible.get(planet)) drawGlobe(t);
+  drawMinis(t); drawWarp();
+  if(!reduce) requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+addEventListener('resize',()=>{initDust();gr=fit(gc);fit(wc);minis.forEach(m=>fit(m.c));});
+
+/* ---------- наклон карточек и магнитные кнопки ---------- */
+if(matchMedia('(pointer:fine)').matches && !reduce){
+  document.querySelectorAll('.tilt').forEach(el=>{
+    el.addEventListener('pointermove',e=>{const r=el.getBoundingClientRect(),px=(e.clientX-r.left)/r.width,py=(e.clientY-r.top)/r.height;
+      el.style.setProperty('--mx',px*100+'%'); el.style.setProperty('--my',py*100+'%');
+      el.style.transform=`perspective(900px) rotateY(${(px-.5)*7}deg) rotateX(${(.5-py)*7}deg) translateY(-4px)`;});
+    el.addEventListener('pointerleave',()=>el.style.transform='');
+  });
+  document.querySelectorAll('.magnet').forEach(el=>{
+    el.addEventListener('pointermove',e=>{const r=el.getBoundingClientRect();
+      el.style.transform=`translate(${(e.clientX-r.left-r.width/2)*.18}px,${(e.clientY-r.top-r.height/2)*.3}px)`;});
+    el.addEventListener('pointerleave',()=>el.style.transform='');
+  });
+}
+
+/* ---------- счётчики ---------- */
+if(!reduce) document.querySelectorAll('[data-count]').forEach(el=>{ const end=+el.dataset.count, start=end>100?end-40:0, t0=performance.now()+600;
+  const step=t=>{const k=Math.max(0,Math.min(1,(t-t0)/1600)); el.textContent=Math.round(start+(end-start)*ease(k)); if(k<1)requestAnimationFrame(step);};
+  requestAnimationFrame(step); });
+
+/* ---------- города ---------- */
+const CITIES=[
+  ['Калининград','адрес мастерской'],['Москва','адрес мастерской'],['Санкт-Петербург','адрес мастерской'],['Белгород','адрес мастерской'],
+  ['Воронеж','адрес мастерской'],['Старый Оскол','адрес мастерской'],['Краснодар','адрес мастерской'],['Уфа','адрес мастерской']];
+const PHONE='+7 (900) 000-00-00';
+const box=document.getElementById('cities'), body=document.getElementById('officeBody');
+function show(i){ [...box.children].forEach((b,j)=>b.setAttribute('aria-pressed',i===j)); const [c,a]=CITIES[i];
+  body.className=''; void body.offsetWidth; body.className='swap';
+  body.innerHTML=`<h3>Фикс Тайм — ${c}</h3><dl><dt>Адрес</dt><dd>${a}</dd><dt>Телефон</dt><dd id="ph">${PHONE}</dd><dt>Часы</dt><dd>Ежедневно с 10 до 19</dd></dl>
+  <div class="actions"><button class="btn btn-primary" id="copy" type="button">Скопировать телефон</button><a class="btn btn-ghost" href="#faq">Как к нам отправить</a><span class="copied" id="cp" hidden>Скопировано</span></div>`;
+  document.getElementById('copy').onclick=()=>{ const done=()=>{const s=document.getElementById('cp');s.hidden=false;setTimeout(()=>s.hidden=true,1600);};
+    navigator.clipboard?.writeText(PHONE).then(done,()=>{const r=document.createRange();r.selectNodeContents(document.getElementById('ph'));const s=getSelection();s.removeAllRanges();s.addRange(r);}); };
+}
+CITIES.forEach(([c],i)=>{const b=document.createElement('button');b.type='button';b.textContent=c;b.onclick=()=>show(i);box.appendChild(b);});
+show(0);
+
+/* ---------- метки: расшифровка сигнала ---------- */
+const GLYPHS='░▒▓◆◇✦✧⌁⌬01/=+АБВГДЖЗКЛМНПРСТФХЦШЩЭЮЯ';
+document.querySelectorAll('.eyebrow').forEach(el=>{
+  const text=el.textContent.trim(); el.setAttribute('aria-label',text);
+  el.innerHTML='<span class="tt" aria-hidden="true"></span>'; const tt=el.firstChild;
+  const render=(n,scr)=>{ let s=''; for(let i=0;i<text.length;i++){ const ch=text[i];
+      if(i<n||ch===' '||ch==='·') s+=ch; else if(i<n+scr) s+='<i>'+GLYPHS[Math.random()*GLYPHS.length|0]+'</i>'; }
+    tt.innerHTML=s+(n<text.length?'<span class="cur"></span>':''); };
+  let busy=false;
+  const play=()=>{ if(busy||reduce){tt.textContent=text;return;} busy=true; const t0=performance.now(), dur=420+text.length*28;
+    const step=t=>{ const k=Math.min(1,(t-t0)/dur); render(Math.floor(k*text.length), 6); if(k<1) requestAnimationFrame(step); else {tt.textContent=text;busy=false;} };
+    requestAnimationFrame(step); };
+  tt.textContent=text;
+  if(io){ const o=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){play();o.unobserve(el);} }),{threshold:.6}); o.observe(el); } else play();
+  el.addEventListener('pointerenter',play);
+});
+})();
+</script>
+
+</html>
