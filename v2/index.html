@@ -146,11 +146,13 @@ header.hide{transform:translateY(-130%)}
 
 /* ---------- бегущие ленты ---------- */
 .ribbons{position:relative;z-index:3;padding-block:clamp(30px,5vw,70px);overflow:hidden}
-.ribbon{display:flex;white-space:nowrap;will-change:transform}
+.ribbon{position:relative;overflow:hidden;width:110%;margin-left:-5%}
+.rt{display:flex;width:max-content;white-space:nowrap;will-change:transform}
 .ribbon span{display:inline-flex;align-items:center;gap:.6em;padding-right:.6em;font:400 clamp(28px,5vw,80px)/1.15 var(--display)}
 .ribbon span::after{content:"✦";font-size:.5em;color:var(--sky)}
-.r1{background:var(--volt);color:#fff;transform:rotate(-2.5deg) scale(1.05);padding-block:.25em;box-shadow:0 30px 60px -30px rgba(18,56,255,.7)}
-.r2{color:transparent;-webkit-text-stroke:1.5px var(--ink);transform:rotate(1.5deg) scale(1.05);margin-top:-.15em;padding-block:.2em;background:var(--paper)}
+.r1{background:var(--volt);color:#fff;transform:rotate(-2.5deg);padding-block:.3em;box-shadow:0 30px 60px -30px rgba(18,56,255,.7);z-index:1}
+.r2{color:transparent;-webkit-text-stroke:1.5px var(--ink);transform:rotate(1.5deg);margin-top:-.2em;padding-block:.3em;background:var(--paper)}
+.r2 .rt{font-size:clamp(28px,5vw,80px)}
 .r2 span::after{-webkit-text-stroke:0;color:var(--volt)}
 
 /* ---------- портал услуг ---------- */
@@ -166,7 +168,7 @@ header.hide{transform:translateY(-130%)}
 .portal-head p{max-width:24em;margin:0;color:#d5e1ff}
 .track{display:flex;gap:clamp(14px,1.6vw,24px);width:max-content;padding-right:var(--pad)}
 .svc{position:relative;flex:none;width:clamp(290px,28vw,460px);min-height:clamp(320px,44vh,500px);border-radius:32px;padding:clamp(24px,2.4vw,36px);display:flex;flex-direction:column;
-  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);overflow:hidden;transition:background .5s,transform .6s var(--ease)}
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);overflow:hidden;transition:background .5s}
 .svc::before{content:"";position:absolute;inset:0;background:radial-gradient(500px circle at var(--mx,50%) var(--my,0%),rgba(98,198,255,.35),transparent 50%);opacity:0;transition:opacity .4s}
 .svc:hover::before{opacity:1}
 .svc>*{position:relative}
@@ -478,8 +480,8 @@ footer{background:var(--ink);color:#fff;overflow:hidden;padding-top:clamp(50px,6
   </section>
 
   <div class="ribbons" aria-hidden="true">
-    <div class="ribbon r1" data-dir="-1"><span>Сборка под заказ</span><span>Замена термопасты</span><span>Апгрейд видеокарты</span><span>Восстановление данных</span><span>Чистка от пыли</span><span>Ремонт принтеров</span><span>3D-печать запчастей</span><span>Моддинг</span><span>Ремонт ноутбуков</span><span>Водяное охлаждение</span></div>
-    <div class="ribbon r2" data-dir="1"><span>Ремонт</span><span>Апгрейд</span><span>Сборка</span><span>3D-печать</span><span>Моддинг</span><span>Ремонт принтеров</span><span>Ремонт</span><span>Апгрейд</span><span>Сборка</span><span>3D-печать</span></div>
+    <div class="ribbon r1" data-dir="-1"><div class="rt"><span>Сборка под заказ</span><span>Замена термопасты</span><span>Апгрейд видеокарты</span><span>Восстановление данных</span><span>Чистка от пыли</span><span>Ремонт принтеров</span><span>3D-печать запчастей</span><span>Моддинг</span><span>Ремонт ноутбуков</span><span>Водяное охлаждение</span></div></div>
+    <div class="ribbon r2" data-dir="1"><div class="rt"><span>Ремонт</span><span>Апгрейд</span><span>Сборка</span><span>3D-печать</span><span>Моддинг</span><span>Ремонт принтеров</span><span>Ремонт</span><span>Апгрейд</span><span>Сборка</span><span>3D-печать</span></div></div>
   </div>
 
   <section class="portal" id="services">
@@ -792,7 +794,7 @@ function drawText(t){
 if('IntersectionObserver' in window) new IntersectionObserver(es=>{heroVisible=es[0].isIntersecting;}).observe(hero);
 
 /* ---------- ленты ---------- */
-const ribbons=$$('.ribbon').map(r=>{r.innerHTML+=r.innerHTML; return {el:r,x:0,dir:+r.dataset.dir};});
+const ribbons=$$('.ribbon').map(r=>{const t=r.querySelector('.rt'); t.innerHTML+=t.innerHTML; return {el:t,x:0,dir:+r.dataset.dir};});
 function drawRibbons(){ const boost=clamp(Math.abs(vel),0,60); const sign=vel<0?-1:1;
   for(const r of ribbons){ const w=r.el.scrollWidth/2; r.x+=(1.1+boost*0.35)*r.dir*sign; if(r.x<-w)r.x+=w; if(r.x>0)r.x-=w;
     r.el.style.translate=`${r.x}px 0`; } }
@@ -848,8 +850,6 @@ function scenes(){
     gsap.from(el,{y:40,opacity:0,duration:1,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 92%'}}));
 
   // ленты проезжают навстречу
-  gsap.fromTo('.r1',{xPercent:6},{xPercent:-6,ease:'none',scrollTrigger:{trigger:'.ribbons',start:'top bottom',end:'bottom top',scrub:true}});
-  gsap.fromTo('.r2',{xPercent:-6},{xPercent:6,ease:'none',scrollTrigger:{trigger:'.ribbons',start:'top bottom',end:'bottom top',scrub:true}});
 
   const mm=gsap.matchMedia();
   mm.add('(min-width: 901px)',()=>{
@@ -899,7 +899,7 @@ function scenes(){
   gsap.from('.warp h2',{scale:.75,ease:'none',scrollTrigger:{trigger:'.warp-wrap',start:'top 90%',end:'top 10%',scrub:true}});
 
   // телефон и гигантское имя
-  gsap.from('#phoneBig .ch',{yPercent:100,opacity:0,stagger:.025,duration:.9,ease:'expo.out',scrollTrigger:{trigger:'#phoneBig',start:'top 90%'}});
+  gsap.from('#phoneBig',{y:60,opacity:0,duration:1,ease:'expo.out',scrollTrigger:{trigger:'#phoneBig',start:'top 92%'}});
   gsap.from('#giant .ch',{yPercent:110,stagger:.05,duration:1.2,ease:'expo.out',scrollTrigger:{trigger:'footer',start:'top 85%'}});
   gsap.to('.hero .wrap',{yPercent:-12,opacity:.2,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:true}});
 }
