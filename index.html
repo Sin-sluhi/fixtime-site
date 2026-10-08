@@ -97,7 +97,7 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;padding-block
 /* герой */
 .hero{padding-block:clamp(30px,6vw,70px) clamp(40px,6vw,80px)}
 .hero-grid{display:grid;grid-template-columns:1.05fr 1fr;gap:20px;align-items:center}
-.hero h1{font-size:clamp(38px,6.2vw,82px);line-height:.98;font-weight:800;margin-block:22px 24px}
+.hero h1{font-size:clamp(38px,4.6vw,62px);line-height:.98;font-weight:800;margin-block:22px 24px}
 .hero h1 .line{display:block;overflow:hidden;padding-bottom:.06em}
 .hero h1 .line span{display:inline-block;animation:rise 1.1s cubic-bezier(.2,.9,.1,1) both}
 .hero h1 .line:nth-child(2) span{animation-delay:.12s}
@@ -326,6 +326,126 @@ footer{border-top:1px solid var(--line);padding-block:40px;color:var(--mute);fon
   .chip{font-size:11px;padding:7px 11px 7px 8px}
   .chip i{width:22px;height:22px}
 }
+/* ---------- адаптив: от обложки Fold (280px) до 4K ---------- */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:clip}
+.hero,.ticker,section{overflow-x:clip}
+img{max-width:100%;height:auto}
+#globe{touch-action:pan-y}
+[hidden]{display:none!important}
+.hero-grid>*,.contacts>*,.print>*,.services>*,.builds>*{min-width:0}
+@media (max-width:980px){.hero-grid{grid-template-columns:minmax(0,1fr)}}
+.mmenu .city{display:flex!important}
+
+/* мобильное меню */
+.mmenu{margin-top:10px;padding:10px;border-radius:26px;background:rgba(255,255,255,.94);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border:1px solid var(--line);box-shadow:0 24px 50px -24px rgba(20,70,201,.45);display:grid;gap:4px;animation:swap .35s cubic-bezier(.2,.8,.2,1)}
+.mmenu a{padding:14px 16px;border-radius:16px;font:500 17px var(--f-body);display:flex;justify-content:space-between;align-items:center}
+.mmenu a:not(.btn):active,.mmenu a:not(.btn):hover{background:var(--ice)}
+.mmenu a:not(.btn)::after{content:"→";color:var(--blue)}
+.mmenu .btn{margin-top:6px;padding:16px}
+.mmenu .city{justify-content:center;margin-top:4px}
+.burger svg path{transition:d .3s}
+.burger[aria-expanded="true"]{background:var(--ink)}
+.burger[aria-expanded="true"] svg{stroke:#fff}
+
+/* ноутбуки и раскладушки: шапка сворачивается раньше, чем ей станет тесно */
+@media (max-width:1140px){
+  .links,.city{display:none}
+  .burger{display:grid;margin-left:auto}
+  .nav>.btn{display:none}
+}
+@media (min-width:1141px){.mmenu{display:none!important}}
+
+/* развёрнутый Fold и Tri-fold: почти квадратный экран, планету не раздуваем */
+@media (max-width:980px){
+  .planet{max-width:min(540px,62svh);width:min(92%,62svh)}
+}
+@media (min-width:600px) and (max-width:1140px) and (min-aspect-ratio:4/5) and (max-aspect-ratio:7/5){
+  .hero-grid{grid-template-columns:1.1fr .9fr}
+  .planet{order:0;width:100%;max-width:none}
+  .hero h1{font-size:clamp(36px,5.2vw,62px)}
+}
+
+/* обычные телефоны */
+@media (max-width:520px){
+  .hero{padding-block:14px 40px}
+  .hero h1{font-size:clamp(26px,10.4vw,54px);margin-block:18px 18px}
+  .lead{font-size:16px;margin-bottom:26px}
+  .stats{gap:18px 28px;margin-top:34px}
+  .stat b{font-size:24px}
+  section{padding-block:64px}
+  .head{margin-bottom:30px}
+  .head h2{font-size:clamp(25px,8vw,34px)}
+  .card{padding:22px}
+  .s-big{min-height:0}
+  .build-body{padding:20px}
+  .price{flex-wrap:wrap}
+  .warp-inner{padding-block:70px}
+  .warp p{font-size:16px}
+  .faq summary{padding:18px 2px}
+  .eyebrow{font-size:11px;letter-spacing:.1em;padding:7px 12px 7px 8px;max-width:100%}
+  .eyebrow .tt{white-space:normal;line-height:1.3}
+}
+
+/* обложка Galaxy Z Fold и узкие телефоны (280–360px) */
+@media (max-width:360px){
+  .wrap{padding-inline:12px}
+  header{padding-block:8px}
+  .nav{padding:6px 6px 6px 12px;gap:8px}
+  .logo-img{width:104px}
+  .burger{width:40px;height:40px}
+  .hero h1{font-size:clamp(24px,10.2vw,40px)}
+  .btn{padding:14px 18px;font-size:14px;white-space:normal;text-align:center}
+  .ctas .btn{width:100%}
+  .chip{font-size:9.5px;padding:5px 8px 5px 5px;gap:5px}
+  .chip i{width:18px;height:18px;font-size:8px}
+  .drag-hint{display:none}
+  .ticker-track{font-size:16px;gap:28px}
+  .ticker-track span{gap:28px}
+  .spec{font-size:13px}
+  .spec li span:first-child{font-size:11px}
+  .price b{font-size:20px}
+  .office{padding:20px}
+  .office h3{font-size:22px}
+  .office dd{font-size:15px}
+  .print{padding:12px}
+  .print-list li{font-size:11.5px;padding:6px 10px}
+  .hud{padding:7px 10px}
+  .gear{width:32px;height:32px}
+  .route span{font-size:11.5px}
+}
+
+/* низкие экраны в горизонтали */
+@media (max-height:500px) and (orientation:landscape){
+  header{position:relative}
+  .hero-grid{grid-template-columns:1.2fr .8fr}
+  .planet{order:0;width:100%;max-width:70svh}
+}
+
+/* большие мониторы: сайт растёт вместе с экраном, а не плавает узкой полосой */
+@media (min-width:1600px){
+  body{font-size:17px}
+  .wrap{max-width:1440px}
+  .hero h1{font-size:clamp(72px,4.4vw,76px)}
+  .head h2{font-size:clamp(56px,3.4vw,66px)}
+  .logo-img{width:150px}
+}
+@media (min-width:2200px){
+  body{font-size:19px}
+  .wrap{max-width:1840px}
+  .hero h1{font-size:clamp(90px,3.85vw,140px)}
+  .head h2{font-size:clamp(66px,3.2vw,84px)}
+  .lead{font-size:24px}
+  .btn{padding:19px 32px;font-size:18px}
+  .links a{font-size:18px;padding:11px 18px}
+  .logo-img{width:190px}
+  .card h3,.build-body h3{font-size:28px}
+  .stat b{font-size:40px}
+  .eyebrow{font-size:16px}
+  .print-text h2{font-size:58px}
+  .warp h2{font-size:clamp(72px,4.4vw,100px)}
+  .warp p{font-size:22px}
+}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
   html{scroll-behavior:auto}
@@ -352,8 +472,18 @@ footer{border-top:1px solid var(--line);padding-block:40px;color:var(--mute);fon
       </div>
       <span class="city"><i></i>Симферополь</span>
       <a class="btn btn-primary" href="#contacts">Позвонить</a>
-      <button class="burger" aria-label="Открыть меню"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0a1838" stroke-width="2" stroke-linecap="round"><path d="M4 8h16M4 16h10"/></svg></button>
+      <button class="burger" id="burger" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="mmenu"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0a1838" stroke-width="2" stroke-linecap="round"><path d="M4 8h16M4 16h10"/></svg></button>
     </nav>
+    <div class="mmenu" id="mmenu" hidden>
+      <a href="#services">Услуги</a>
+      <a href="#builds">Сборки</a>
+      <a href="#print">3D-печать</a>
+      <a href="#repair">Ремонт</a>
+      <a href="#faq">Вопросы</a>
+      <a href="#contacts">Контакты</a>
+      <span class="city"><i></i>Симферополь · с 9 до 19</span>
+      <a class="btn btn-primary" href="#contacts">+7 (978) 287-31-04</a>
+    </div>
   </div>
 </header>
 
@@ -586,7 +716,7 @@ footer{border-top:1px solid var(--line);padding-block:40px;color:var(--mute);fon
 <script>
 (()=>{
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const DPR = Math.min(devicePixelRatio||1, 2);
+let DPR = Math.min(devicePixelRatio||1, 2);
 const fit = c => { const r=c.getBoundingClientRect(); c.width=Math.max(1,r.width*DPR); c.height=Math.max(1,r.height*DPR); return r; };
 const visible = new WeakMap();
 const io = 'IntersectionObserver' in window ? new IntersectionObserver(es=>es.forEach(e=>visible.set(e.target,e.isIntersecting))) : null;
@@ -617,6 +747,7 @@ let rotY=0, rotX=-.35, vy=.0035, dragging=false, lx=0, ly=0, born=performance.no
 gc.addEventListener('pointerdown',e=>{dragging=true;lx=e.clientX;ly=e.clientY;gc.setPointerCapture(e.pointerId)});
 gc.addEventListener('pointermove',e=>{ if(!dragging)return; vy=(e.clientX-lx)*.0009; rotX=Math.max(-1.1,Math.min(.6,rotX+(e.clientY-ly)*.004)); lx=e.clientX;ly=e.clientY;});
 addEventListener('pointerup',()=>dragging=false);
+gc.addEventListener('pointercancel',()=>dragging=false);
 let gr=fit(gc);
 const chips=[...planet.querySelectorAll('.chip')];
 const ease=t=>1-Math.pow(1-t,4);
@@ -695,7 +826,22 @@ function frame(t){
   if(!reduce) requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
-addEventListener('resize',()=>{initDust();gr=fit(gc);fit(wc);minis.forEach(m=>fit(m.c));});
+/* пересчёт холстов: поворот, складывание Fold, переезд окна на другой монитор */
+let rt=0;
+const refit=()=>{clearTimeout(rt);rt=setTimeout(()=>{DPR=Math.min(devicePixelRatio||1,2);initDust();gr=fit(gc);fit(wc);minis.forEach(m=>fit(m.c));},120);};
+addEventListener('resize',refit);
+addEventListener('orientationchange',refit);
+if('ResizeObserver' in window) new ResizeObserver(refit).observe(planet);
+const watchDpr=()=>{const m=matchMedia(`(resolution: ${devicePixelRatio}dppx)`);m.addEventListener?.('change',()=>{refit();watchDpr();},{once:true});};
+watchDpr();
+
+/* мобильное меню */
+const burger=document.getElementById('burger'), mmenu=document.getElementById('mmenu');
+const setMenu=open=>{mmenu.hidden=!open;burger.setAttribute('aria-expanded',open);burger.setAttribute('aria-label',open?'Закрыть меню':'Открыть меню');
+  burger.querySelector('path').setAttribute('d',open?'M6 6l12 12M18 6L6 18':'M4 8h16M4 16h10');};
+burger.addEventListener('click',()=>setMenu(mmenu.hidden));
+mmenu.addEventListener('click',e=>{if(e.target.closest('a'))setMenu(false);});
+addEventListener('keydown',e=>{if(e.key==='Escape')setMenu(false);});
 
 /* ---------- наклон карточек и магнитные кнопки ---------- */
 if(matchMedia('(pointer:fine)').matches && !reduce){
