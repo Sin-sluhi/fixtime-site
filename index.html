@@ -235,6 +235,53 @@ section{padding-block:clamp(70px,10vw,130px)}
 @keyframes swap{from{opacity:0;transform:translateY(10px);filter:blur(4px)}}
 .copied{font:500 12px var(--f-mono);color:var(--blue);align-self:center}
 
+/* логотип-картинка */
+.logo-img{position:relative;display:block;width:132px;line-height:0}
+.logo-img img{width:100%;height:auto}
+.logo-spark{position:absolute;left:4%;top:38.5%;width:10%;height:3px;border-radius:3px;background:linear-gradient(90deg,transparent,#9fe0ff,transparent);filter:drop-shadow(0 0 4px #5cc3ff);animation:lspark 3s cubic-bezier(.6,0,.4,1) infinite;pointer-events:none}
+@keyframes lspark{0%{left:4%;opacity:0}12%{opacity:1}75%{opacity:1}88%{left:66%;opacity:0}100%{left:66%;opacity:0}}
+.logo:hover .logo-spark{animation-duration:1s}
+footer .logo-img{width:150px}
+.soon{align-self:center;font:500 13px var(--f-mono);color:var(--mute);padding:12px 6px}
+
+/* 3D-печать */
+.print{display:grid;grid-template-columns:1.1fr 1fr;gap:clamp(24px,4vw,56px);align-items:center;border-radius:clamp(24px,3vw,36px);
+  padding:clamp(20px,3vw,40px);background:linear-gradient(150deg,var(--white),var(--ice));border:1px solid var(--frost);overflow:hidden}
+.print-stage{position:relative;aspect-ratio:1.25;border-radius:var(--r);overflow:hidden;
+  background:radial-gradient(ellipse at 50% 40%,var(--white),var(--ice) 60%,var(--frost));min-width:0}
+.floor{position:absolute;left:-30%;right:-30%;bottom:-10%;height:60%;transform:perspective(500px) rotateX(62deg);transform-origin:bottom;
+  background-image:linear-gradient(rgba(31,107,255,.22) 1px,transparent 1px),linear-gradient(90deg,rgba(31,107,255,.22) 1px,transparent 1px);
+  background-size:40px 40px;-webkit-mask:linear-gradient(transparent,#000 60%);mask:linear-gradient(transparent,#000 60%);animation:floor 6s linear infinite}
+@keyframes floor{to{background-position:0 40px}}
+.printer{position:absolute;left:6%;top:8%;width:88%;height:auto;filter:drop-shadow(0 30px 30px rgba(20,70,201,.25));animation:hover 6s ease-in-out infinite}
+@keyframes hover{50%{transform:translateY(-10px)}}
+.scan{position:absolute;left:0;right:0;height:26%;top:0;pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(92,195,255,.18) 85%,rgba(92,195,255,.9) 98%,transparent);mix-blend-mode:multiply;animation:scan 4.5s cubic-bezier(.5,0,.5,1) infinite}
+.scan::after{content:"";position:absolute;left:0;right:0;bottom:2%;height:2px;background:var(--sky);box-shadow:0 0 14px 2px var(--sky)}
+@keyframes scan{0%{transform:translateY(310%);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-40%);opacity:0}}
+.hud{position:absolute;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:16px;background:rgba(255,255,255,.85);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--frost);box-shadow:0 12px 30px -16px rgba(20,70,201,.5)}
+.hud span{display:block;font:500 10px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.hud b{font:600 14px var(--f-tag);color:var(--ink);font-variant-numeric:tabular-nums}
+.hud-tl{top:14px;left:14px;flex-direction:column;align-items:flex-start;gap:2px}
+.hud-br{right:14px;bottom:14px}
+.gear{width:44px;height:44px;flex:none}
+.gear-ghost{fill:none;stroke:var(--frost);stroke-width:1.5}
+.gear-fill{fill:var(--blue)}
+.layer-rect{animation:layer 4.5s steps(24) infinite}
+@keyframes layer{from{transform:translateY(64px)}90%,to{transform:translateY(0)}}
+.pbar{display:block;width:110px;height:4px;border-radius:4px;background:var(--ice);margin-top:6px;overflow:hidden}
+.pbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--sky),var(--blue));animation:pbar 4.5s steps(24) infinite}
+@keyframes pbar{90%,to{width:100%}}
+.print-text{min-width:0}
+.print-text h2{font-size:clamp(28px,3.6vw,46px);line-height:1.05;font-weight:700;margin:18px 0 18px}
+.print-text>p{color:var(--mute);margin:0 0 22px;max-width:36em}
+.print-list{list-style:none;padding:0;margin:0 0 20px;display:flex;flex-wrap:wrap;gap:8px}
+.print-list li{font:500 13px var(--f-mono);padding:8px 12px;border-radius:999px;background:var(--white);border:1px solid var(--frost);color:var(--cobalt);transition:.25s}
+.print-list li:hover{border-color:var(--sky);transform:translateY(-2px);box-shadow:0 8px 20px -12px rgba(31,107,255,.6)}
+.print-text .print-note{font-weight:600;color:var(--ink);margin-bottom:26px}
+@media (max-width:980px){.print{grid-template-columns:1fr}}
+@media (max-width:520px){.hud-tl{display:none}.pbar{width:80px}}
 /* FAQ */
 .faq{max-width:860px}
 .faq details{border-bottom:1px solid var(--frost)}
@@ -293,31 +340,17 @@ footer{border-top:1px solid var(--line);padding-block:40px;color:var(--mute);fon
   <div class="wrap">
     <nav class="nav" aria-label="Основное меню">
       <a class="logo" href="#top" aria-label="Фикс Тайм, на главную">
-        <svg class="ft-logo" viewBox="0 0 200 92" aria-hidden="true">
-          <defs>
-            <linearGradient id="ftBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f7bff"/><stop offset="1" stop-color="#1446c9"/></linearGradient>
-            <linearGradient id="ftWire" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1f6bff"/><stop offset=".75" stop-color="#1446c9"/><stop offset="1" stop-color="#0a1838"/></linearGradient>
-          </defs>
-          <g id="ftMark">
-          <text x="4" y="36" font-family="'Exo 2',Onest,sans-serif" font-style="italic" font-weight="800" font-size="40" fill="#0a1838" letter-spacing="-1">Фикс</text>
-          <circle cx="12" cy="47" r="5" fill="#fff" stroke="#1f6bff" stroke-width="3"/>
-          <path d="M17 47H172" stroke="url(#ftWire)" stroke-width="3.2"/>
-          <path class="ft-spark" d="M17 47H172" stroke="#5cc3ff" stroke-width="3.2" stroke-linecap="round" pathLength="100"/>
-          <path d="M172 41h8l3 3v6l-3 3h-8z" fill="#0a1838"/>
-          <rect x="184" y="39" width="10" height="16" rx="2" fill="#0a1838"/>
-          <text x="58" y="86" font-family="'Exo 2',Onest,sans-serif" font-style="italic" font-weight="800" font-size="40" fill="url(#ftBlue)" letter-spacing="-1">Тайм</text>
-          </g>
-        </svg>
-        <small class="ft-sub">компьютерная<br>мастерская</small>
+        <span class="logo-img"><img src="img/logo.png" alt="Фикс Тайм — компьютерная мастерская" width="900" height="356"><i class="logo-spark" aria-hidden="true"></i></span>
       </a>
       <div class="links">
         <a href="#services">Услуги</a>
         <a href="#builds">Сборки</a>
+        <a href="#print">3D-печать</a>
         <a href="#repair">Ремонт</a>
         <a href="#faq">FAQ</a>
         <a href="#contacts">Контакты</a>
       </div>
-      <span class="city"><i></i>Калининград</span>
+      <span class="city"><i></i>Симферополь</span>
       <a class="btn btn-primary" href="#contacts">Позвонить</a>
       <button class="burger" aria-label="Открыть меню"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0a1838" stroke-width="2" stroke-linecap="round"><path d="M4 8h16M4 16h10"/></svg></button>
     </nav>
@@ -328,13 +361,13 @@ footer{border-top:1px solid var(--line);padding-block:40px;color:var(--mute);fon
   <section class="hero">
     <div class="wrap hero-grid">
       <div>
-        <span class="eyebrow">Ремонт · апгрейд · сборка с 2018 года</span>
+        <span class="eyebrow">Ремонт · апгрейд · сборка · 3D-печать</span>
         <h1>
           <span class="line"><span>Мастерская</span></span>
           <span class="line"><span>счастливых</span></span>
           <span class="line"><em>компьютеров</em></span>
         </h1>
-        <p class="lead">Ремонтируем, прокачиваем и собираем компьютеры по всей России. Каждую сборку гоняем стресс-тестом, прежде чем она уйдёт к вам.</p>
+        <p class="lead">Ремонтируем, прокачиваем и собираем компьютеры в Симферополе. Каждую сборку гоняем стресс-тестом, прежде чем она уйдёт к вам.</p>
         <div class="ctas">
           <a class="btn btn-primary magnet" href="#builds">Собрать ПК под заказ
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
@@ -342,9 +375,9 @@ footer{border-top:1px solid var(--line);padding-block:40px;color:var(--mute);fon
           <a class="btn btn-ghost magnet" href="#repair">Отправить на ремонт</a>
         </div>
         <div class="stats">
-          <div class="stat"><b data-count="2018">2018</b><span>работаем с</span></div>
-          <div class="stat"><b data-count="8">8</b><span>городов</span></div>
-          <div class="stat"><b>10–19</b><span>ежедневно</span></div>
+          <div class="stat"><b data-count="2026">2026</b><span>работаем с</span></div>
+          <div class="stat"><b>3D</b><span>печать деталей</span></div>
+          <div class="stat"><b>9–19</b><span>ежедневно</span></div>
         </div>
       </div>
       <div class="planet" id="planet">
@@ -363,8 +396,8 @@ footer{border-top:1px solid var(--line);padding-block:40px;color:var(--mute);fon
 
   <div class="ticker" aria-hidden="true">
     <div class="ticker-track">
-      <span>Сборка под заказ</span><span>Замена термопасты</span><span>Апгрейд видеокарты</span><span>Восстановление данных</span><span>Чистка от пыли</span><span>Установка Windows</span><span>Ремонт ноутбуков</span><span>Водяное охлаждение</span>
-      <span>Сборка под заказ</span><span>Замена термопасты</span><span>Апгрейд видеокарты</span><span>Восстановление данных</span><span>Чистка от пыли</span><span>Установка Windows</span><span>Ремонт ноутбуков</span><span>Водяное охлаждение</span>
+      <span>Сборка под заказ</span><span>Замена термопасты</span><span>Апгрейд видеокарты</span><span>Восстановление данных</span><span>Чистка от пыли</span><span>Ремонт принтеров</span><span>3D-печать запчастей</span><span>Моддинг</span><span>Ремонт ноутбуков</span><span>Водяное охлаждение</span>
+      <span>Сборка под заказ</span><span>Замена термопасты</span><span>Апгрейд видеокарты</span><span>Восстановление данных</span><span>Чистка от пыли</span><span>Ремонт принтеров</span><span>3D-печать запчастей</span><span>Моддинг</span><span>Ремонт ноутбуков</span><span>Водяное охлаждение</span>
     </div>
   </div>
 
@@ -403,8 +436,40 @@ footer{border-top:1px solid var(--line);padding-block:40px;color:var(--mute);fon
         <article class="card s-sm tilt reveal">
           <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></div>
           <h3>Данные и система</h3>
-          <p>Восстановим файлы с умершего диска, перенесём систему на новый SSD, поставим Windows и драйверы.</p>
+          <p>Восстановим файлы с умершего диска, перенесём систему и файлы на новый SSD.</p>
         </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="print" style="padding-top:0">
+    <div class="wrap">
+      <div class="print reveal">
+        <div class="print-stage">
+          <div class="floor" aria-hidden="true"></div>
+          <img class="printer" src="img/printer.png" alt="3D-принтер с системой подачи нескольких пластиков" width="683" height="475" loading="lazy">
+          <div class="scan" aria-hidden="true"></div>
+          <div class="hud hud-tl" aria-hidden="true"><span>сопло</span><b>220 °C</b></div>
+          <div class="hud hud-br" aria-hidden="true">
+            <svg class="gear" viewBox="0 0 64 64">
+              <defs><clipPath id="layer"><rect class="layer-rect" x="0" y="0" width="64" height="64"/></clipPath></defs>
+              <path class="gear-ghost" d="M28 4h8l1.5 7.2a21 21 0 0 1 6 2.5l6.2-4 5.6 5.6-4 6.2a21 21 0 0 1 2.5 6L61 28v8l-7.2 1.5a21 21 0 0 1-2.5 6l4 6.2-5.6 5.6-6.2-4a21 21 0 0 1-6 2.5L36 61h-8l-1.5-7.2a21 21 0 0 1-6-2.5l-6.2 4-5.6-5.6 4-6.2a21 21 0 0 1-2.5-6L3 36v-8l7.2-1.5a21 21 0 0 1 2.5-6l-4-6.2 5.6-5.6 6.2 4a21 21 0 0 1 6-2.5zM32 22a10 10 0 1 0 0 20a10 10 0 1 0 0-20z"/>
+              <path class="gear-fill" clip-path="url(#layer)" d="M28 4h8l1.5 7.2a21 21 0 0 1 6 2.5l6.2-4 5.6 5.6-4 6.2a21 21 0 0 1 2.5 6L61 28v8l-7.2 1.5a21 21 0 0 1-2.5 6l4 6.2-5.6 5.6-6.2-4a21 21 0 0 1-6 2.5L36 61h-8l-1.5-7.2a21 21 0 0 1-6-2.5l-6.2 4-5.6-5.6 4-6.2a21 21 0 0 1-2.5-6L3 36v-8l7.2-1.5a21 21 0 0 1 2.5-6l-4-6.2 5.6-5.6 6.2 4a21 21 0 0 1 6-2.5zM32 22a10 10 0 1 0 0 20a10 10 0 1 0 0-20z" fill-rule="evenodd"/>
+            </svg>
+            <div><span>печатаем</span><b id="layerNo">слой 1 / 240</b><i class="pbar"><i></i></i></div>
+          </div>
+        </div>
+        <div class="print-text">
+          <span class="eyebrow">Моддинг и 3D-печать</span>
+          <h2>Нет нужной детали? Напечатаем</h2>
+          <p>Сломалась защёлка, потерялась заглушка, провисает видеокарта? Смоделируем и распечатаем деталь на 3D-принтере, а не будем ждать её неделями. Делаем и моддинг: свои панели, подсветку, надписи и детали для корпуса.</p>
+          <ul class="print-list">
+            <li>крепления видеокарт</li><li>заглушки и решётки</li><li>ножки и кронштейны</li><li>рамки вентиляторов</li><li>детали для моддинга</li><li>корпуса для электроники</li>
+          </ul>
+          <p class="print-note">Чиним и сами принтеры: обычные и 3D.</p>
+          <a class="btn btn-primary magnet" href="#contacts">Прислать фото детали
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        </div>
       </div>
     </div>
   </section>
@@ -486,7 +551,7 @@ footer{border-top:1px solid var(--line);padding-block:40px;color:var(--mute);fon
   <section id="contacts">
     <div class="wrap">
       <div class="head reveal">
-        <div><span class="eyebrow">Контакты</span><h2>Восемь мастерских, выберите свою</h2></div>
+        <div><span class="eyebrow">Контакты</span><h2>Мастерская в Симферополе</h2></div>
       </div>
       <div class="contacts reveal">
         <div class="cities" id="cities" role="group" aria-label="Город"></div>
@@ -513,8 +578,8 @@ footer{border-top:1px solid var(--line);padding-block:40px;color:var(--mute);fon
 
 <footer>
   <div class="wrap foot">
-    <span class="logo"><svg class="ft-logo" viewBox="0 0 200 92" aria-hidden="true"><use href="#ftMark"/></svg><small class="ft-sub">компьютерная мастерская<br>с 2018 года</small></span>
-    <span>Ремонт, апгрейд и сборка компьютеров по всей России</span>
+    <span class="logo"><span class="logo-img"><img src="img/logo.png" alt="Фикс Тайм" width="900" height="356"></span></span>
+    <span>Симферополь · ежедневно с 9 до 19 · +7 (978) 287-31-04</span>
   </div>
 </footer>
 </div>
@@ -654,19 +719,18 @@ if(!reduce) document.querySelectorAll('[data-count]').forEach(el=>{ const end=+e
   requestAnimationFrame(step); });
 
 /* ---------- города ---------- */
-const CITIES=[
-  ['Калининград','адрес мастерской'],['Москва','адрес мастерской'],['Санкт-Петербург','адрес мастерской'],['Белгород','адрес мастерской'],
-  ['Воронеж','адрес мастерской'],['Старый Оскол','адрес мастерской'],['Краснодар','адрес мастерской'],['Уфа','адрес мастерской']];
-const PHONE='+7 (900) 000-00-00';
+const CITIES=[['Симферополь','адрес уточняется']];
+const PHONE='+7 (978) 287-31-04';
 const box=document.getElementById('cities'), body=document.getElementById('officeBody');
 function show(i){ [...box.children].forEach((b,j)=>b.setAttribute('aria-pressed',i===j)); const [c,a]=CITIES[i];
   body.className=''; void body.offsetWidth; body.className='swap';
-  body.innerHTML=`<h3>Фикс Тайм — ${c}</h3><dl><dt>Адрес</dt><dd>${a}</dd><dt>Телефон</dt><dd id="ph">${PHONE}</dd><dt>Часы</dt><dd>Ежедневно с 10 до 19</dd></dl>
+  body.innerHTML=`<h3>Фикс Тайм — ${c}</h3><dl><dt>Адрес</dt><dd>${a}</dd><dt>Телефон</dt><dd id="ph">${PHONE}</dd><dt>Часы</dt><dd>Ежедневно с 9 до 19</dd></dl>
   <div class="actions"><button class="btn btn-primary" id="copy" type="button">Скопировать телефон</button><a class="btn btn-ghost" href="#faq">Как к нам отправить</a><span class="copied" id="cp" hidden>Скопировано</span></div>`;
   document.getElementById('copy').onclick=()=>{ const done=()=>{const s=document.getElementById('cp');s.hidden=false;setTimeout(()=>s.hidden=true,1600);};
     navigator.clipboard?.writeText(PHONE).then(done,()=>{const r=document.createRange();r.selectNodeContents(document.getElementById('ph'));const s=getSelection();s.removeAllRanges();s.addRange(r);}); };
 }
 CITIES.forEach(([c],i)=>{const b=document.createElement('button');b.type='button';b.textContent=c;b.onclick=()=>show(i);box.appendChild(b);});
+box.insertAdjacentHTML('beforeend','<span class="soon">новые города скоро</span>');
 show(0);
 
 /* ---------- метки: расшифровка сигнала ---------- */
@@ -685,6 +749,12 @@ document.querySelectorAll('.eyebrow').forEach(el=>{
   if(io){ const o=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){play();o.unobserve(el);} }),{threshold:.6}); o.observe(el); } else play();
   el.addEventListener('pointerenter',play);
 });
+
+/* ---------- счётчик слоёв 3D-печати (в такт анимации 4.5 с, 24 шага) ---------- */
+const layerNo=document.getElementById('layerNo');
+if(layerNo && !reduce){ const t0=performance.now();
+  setInterval(()=>{ const k=((performance.now()-t0)%4500)/4050; const n=Math.min(24,Math.floor(k*24)+1);
+    layerNo.textContent='слой '+(n*10)+' / 240'; },120); }
 })();
 </script>
 
