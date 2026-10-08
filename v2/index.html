@@ -1,0 +1,934 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Фикс Тайм — ремонт компьютеров в Симферополе</title>
+<meta name="description" content="Ремонт, апгрейд и сборка компьютеров, 3D-печать запчастей и моддинг. Симферополь, ежедневно с 9 до 19.">
+<meta name="theme-color" content="#1238ff">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Geologica:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<script>document.documentElement.classList.add('js')</script>
+<style>
+/* Раскладка: белый «чертёж» → электрический синий портал с горизонтальной лентой услуг → провод из логотипа ведёт по шагам → печать по прокрутке → стопка сборок → гиперпрыжок → синий экран контактов → гигантское имя */
+:root{
+  --paper:#f5f8ff;
+  --white:#ffffff;
+  --volt:#1238ff;
+  --volt2:#0a24c4;
+  --sky:#62c6ff;
+  --ice:#e6eeff;
+  --ink:#060b26;
+  --navy:#030820;
+  --mute:#5b6690;
+  --display:"Dela Gothic One","Arial Black",Impact,sans-serif;
+  --body:"Geologica","Segoe UI",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --pad:clamp(16px,4vw,56px);
+  --ease:cubic-bezier(.7,0,.2,1);
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:clip}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 17px/1.6 var(--body);-webkit-font-smoothing:antialiased;overflow-x:clip}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:200;opacity:.06;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+img{max-width:100%;height:auto;display:block}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--sky);outline-offset:4px;border-radius:6px}
+.wrap{width:100%;max-width:1680px;margin:0 auto;padding-inline:var(--pad)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+h1,h2,h3{margin:0;font-weight:400;font-family:var(--display);line-height:.95;letter-spacing:-.01em;text-wrap:balance}
+.tag{display:inline-flex;align-items:center;gap:10px;font:600 12px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase}
+.tag::before{content:"";width:22px;height:2px;background:currentColor}
+.w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-bottom:-.08em}
+.ch{display:inline-block;will-change:transform}
+
+/* ---------- курсор ---------- */
+.cur,.cur-ring{position:fixed;left:0;top:0;pointer-events:none;z-index:300;border-radius:50%;display:none}
+@media (pointer:fine){.cur,.cur-ring{display:block}}
+.cur{width:8px;height:8px;margin:-4px 0 0 -4px;background:#fff;mix-blend-mode:difference}
+.cur-ring{width:44px;height:44px;margin:-22px 0 0 -22px;border:1.5px solid #fff;mix-blend-mode:difference;display:grid;place-items:center;
+  transition:width .35s var(--ease),height .35s var(--ease),margin .35s var(--ease),background .35s}
+.cur-ring span{font:600 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#000;opacity:0;transition:opacity .2s}
+.cur-ring.big{width:110px;height:110px;margin:-55px 0 0 -55px;background:#fff}
+.cur-ring.big span{opacity:1}
+.cur-ring.link{width:70px;height:70px;margin:-35px 0 0 -35px}
+
+/* ---------- вступление ---------- */
+#intro{display:none}
+.js #intro{display:block;position:fixed;inset:0;z-index:250;pointer-events:none}
+.intro-half{position:absolute;left:0;right:0;height:50.5%;background:var(--volt);transition:transform 1.1s var(--ease)}
+.intro-half.t{top:0}.intro-half.b{bottom:0}
+.intro-core{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:26px;color:#fff;transition:opacity .4s,transform .6s var(--ease)}
+.intro-name{font:400 clamp(34px,8vw,120px)/1 var(--display);letter-spacing:-.02em;display:flex;gap:.25em;overflow:hidden}
+.intro-name span{display:inline-block;animation:inUp 1s var(--ease) both}
+.intro-name span:nth-child(2){animation-delay:.08s;color:var(--sky)}
+@keyframes inUp{from{transform:translateY(110%)}}
+.intro-wire{display:flex;align-items:center;width:min(520px,76vw)}
+.intro-wire b{width:14px;height:14px;border-radius:50%;border:3px solid #fff;flex:none}
+.intro-wire i{height:3px;background:#fff;width:0;flex:none;box-shadow:0 0 12px var(--sky)}
+.intro-wire em{width:26px;height:16px;border-radius:3px;background:#fff;flex:none;margin-left:-1px;box-shadow:8px 0 0 -3px var(--sky)}
+.intro-count{font:600 13px var(--mono);letter-spacing:.3em}
+#intro.done .intro-core{opacity:0;transform:scale(.96)}
+#intro.done .intro-half.t{transform:translateY(-101%)}
+#intro.done .intro-half.b{transform:translateY(101%)}
+
+/* ---------- шапка ---------- */
+header{position:fixed;left:0;right:0;top:0;z-index:120;padding-top:calc(env(safe-area-inset-top,0px) + 14px);transition:transform .5s var(--ease)}
+header.hide{transform:translateY(-130%)}
+.nav{display:flex;align-items:center;gap:14px;padding:8px 8px 8px 18px;border-radius:999px;background:rgba(255,255,255,.82);
+  backdrop-filter:blur(20px) saturate(1.5);-webkit-backdrop-filter:blur(20px) saturate(1.5);border:1px solid rgba(18,56,255,.12);box-shadow:0 18px 40px -24px rgba(10,36,196,.5)}
+.logo{display:block;width:128px;line-height:0;flex:none}
+.links{display:flex;gap:2px;margin-left:auto}
+.links a{position:relative;padding:10px 14px;border-radius:999px;font-weight:500;font-size:15px;overflow:hidden}
+.links a span{display:inline-block;transition:transform .45s var(--ease)}
+.links a::after{content:attr(data-t);position:absolute;left:14px;top:100%;padding-top:10px;color:var(--volt);transition:transform .45s var(--ease)}
+.links a:hover span{transform:translateY(-140%)}
+.links a:hover::after{transform:translateY(-100%)}
+.call{display:inline-flex;align-items:center;gap:10px;padding:13px 20px;border-radius:999px;background:var(--ink);color:#fff;font:600 14px var(--body);white-space:nowrap;transition:background .3s}
+.call:hover{background:var(--volt)}
+.call i{width:8px;height:8px;border-radius:50%;background:#2bd67b;box-shadow:0 0 0 0 rgba(43,214,123,.6);animation:ping 2s infinite}
+@keyframes ping{70%{box-shadow:0 0 0 10px rgba(43,214,123,0)}}
+.burger{display:none;width:46px;height:46px;border-radius:50%;background:var(--ink);place-items:center;margin-left:auto}
+.burger svg{stroke:#fff}
+.mmenu{margin-top:10px;border-radius:28px;background:var(--volt);color:#fff;padding:14px;display:grid;gap:2px;box-shadow:0 30px 60px -30px rgba(10,36,196,.8)}
+.mmenu a{font:400 clamp(24px,7vw,34px)/1.1 var(--display);padding:12px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.15)}
+.mmenu a::after{content:"↗";font:500 20px var(--body);color:var(--sky)}
+.mmenu .mm-info{font:500 13px var(--mono);letter-spacing:.08em;padding:16px 10px 6px;color:#cfe0ff}
+.mmenu .mm-phone{background:#fff;color:var(--volt);border-radius:18px;margin-top:6px;border:0;font-size:clamp(20px,6vw,26px);justify-content:center}
+.mmenu .mm-phone::after{display:none}
+
+/* ---------- герой ---------- */
+.hero{position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding-top:120px;padding-bottom:clamp(28px,4vw,56px);overflow:hidden;
+  background:
+    radial-gradient(ellipse 60% 50% at 75% 20%,rgba(98,198,255,.28),transparent 70%),
+    radial-gradient(ellipse 50% 40% at 10% 90%,rgba(18,56,255,.12),transparent 70%),var(--paper)}
+.hero::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(18,56,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(18,56,255,.07) 1px,transparent 1px);background-size:56px 56px;
+  -webkit-mask:radial-gradient(ellipse 80% 70% at 50% 40%,#000,transparent 80%);mask:radial-gradient(ellipse 80% 70% at 50% 40%,#000,transparent 80%)}
+#ptext{position:absolute;inset:0;width:100%;height:100%;z-index:1}
+.hero .wrap{position:relative;z-index:2;pointer-events:none}
+.hero .wrap a,.hero .wrap button{pointer-events:auto}
+.hero-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 24px;align-items:center;color:var(--volt);margin-bottom:clamp(14px,2vw,24px)}
+.hero-top .loc{font:500 13px var(--mono);letter-spacing:.1em;color:var(--mute);text-transform:uppercase}
+.ptext-space{width:100%;height:21vw}
+.no-canvas .ptext-space{display:none}
+.no-canvas .hero h1.sr{position:static;width:auto;height:auto;clip:auto;white-space:normal;font-size:clamp(40px,10vw,170px)}
+.hero-bottom{display:grid;grid-template-columns:minmax(260px,1fr) minmax(0,auto) auto;gap:clamp(20px,3vw,48px);align-items:end;margin-top:clamp(18px,3vw,40px);padding-top:clamp(18px,2vw,28px);border-top:1.5px solid var(--ink)}
+.lead{margin:0;max-width:30em;font-size:clamp(16px,1.3vw,20px);color:var(--mute)}
+.lead b{color:var(--ink);font-weight:600}
+.ctas{display:flex;flex-wrap:wrap;gap:10px;max-width:470px}
+.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:12px;padding:18px 26px;border-radius:999px;font:600 15px/1 var(--body);white-space:nowrap;overflow:hidden;isolation:isolate;transition:color .45s var(--ease),border-color .45s}
+.btn::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;transform:translateY(101%);transition:transform .5s var(--ease)}
+.btn:hover::before{transform:none}
+.btn svg{width:18px;height:18px;transition:transform .45s var(--ease)}
+.btn:hover svg{transform:translateX(4px) rotate(-45deg)}
+.btn-volt{background:var(--volt);color:#fff;box-shadow:0 18px 40px -16px rgba(18,56,255,.8)}
+.btn-volt::before{background:var(--ink)}
+.btn-line{border:1.5px solid var(--ink);color:var(--ink)}
+.btn-line::before{background:var(--ink)}
+.btn-line:hover{color:#fff}
+.btn-white{background:#fff;color:var(--volt)}
+.btn-white::before{background:var(--sky)}
+.btn-white:hover{color:var(--ink)}
+.stats{display:flex;gap:clamp(18px,2.4vw,36px)}
+.stat b{display:block;font:400 clamp(26px,2.6vw,42px)/1 var(--display);font-variant-numeric:tabular-nums}
+.stat span{font:500 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.scroll-hint{position:absolute;right:var(--pad);top:50%;z-index:2;writing-mode:vertical-rl;font:600 11px var(--mono);letter-spacing:.3em;text-transform:uppercase;color:var(--mute);display:flex;align-items:center;gap:14px}
+.scroll-hint::after{content:"";width:1.5px;height:70px;background:linear-gradient(var(--volt),transparent);animation:drip 1.8s var(--ease) infinite;transform-origin:top}
+@keyframes drip{0%{transform:scaleY(0)}50%{transform:scaleY(1);transform-origin:top}50.1%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* ---------- бегущие ленты ---------- */
+.ribbons{position:relative;z-index:3;padding-block:clamp(30px,5vw,70px);overflow:hidden}
+.ribbon{display:flex;white-space:nowrap;will-change:transform}
+.ribbon span{display:inline-flex;align-items:center;gap:.6em;padding-right:.6em;font:400 clamp(28px,5vw,80px)/1.15 var(--display)}
+.ribbon span::after{content:"✦";font-size:.5em;color:var(--sky)}
+.r1{background:var(--volt);color:#fff;transform:rotate(-2.5deg) scale(1.05);padding-block:.25em;box-shadow:0 30px 60px -30px rgba(18,56,255,.7)}
+.r2{color:transparent;-webkit-text-stroke:1.5px var(--ink);transform:rotate(1.5deg) scale(1.05);margin-top:-.15em;padding-block:.2em;background:var(--paper)}
+.r2 span::after{-webkit-text-stroke:0;color:var(--volt)}
+
+/* ---------- портал услуг ---------- */
+.portal{position:relative;overflow:hidden;color:#fff}
+.portal-bg{position:absolute;inset:0;background:
+  radial-gradient(ellipse 60% 60% at 80% 10%,rgba(98,198,255,.45),transparent 60%),
+  radial-gradient(ellipse 50% 50% at 0% 100%,rgba(3,8,32,.5),transparent 70%),var(--volt)}
+.portal-bg::after{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.18) 1px,transparent 1.5px);background-size:28px 28px;
+  -webkit-mask:linear-gradient(transparent,#000 30%,#000 70%,transparent);mask:linear-gradient(transparent,#000 30%,#000 70%,transparent)}
+.portal-in{position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:center;gap:clamp(24px,4vh,56px);padding-block:clamp(84px,11vh,130px) clamp(24px,5vh,70px)}
+.portal-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:20px}
+.portal-head h2{font-size:clamp(38px,min(6vw,10vh),120px);max-width:9em}
+.portal-head p{max-width:24em;margin:0;color:#d5e1ff}
+.track{display:flex;gap:clamp(14px,1.6vw,24px);width:max-content;padding-right:var(--pad)}
+.svc{position:relative;flex:none;width:clamp(290px,28vw,460px);min-height:clamp(320px,44vh,500px);border-radius:32px;padding:clamp(24px,2.4vw,36px);display:flex;flex-direction:column;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);overflow:hidden;transition:background .5s,transform .6s var(--ease)}
+.svc::before{content:"";position:absolute;inset:0;background:radial-gradient(500px circle at var(--mx,50%) var(--my,0%),rgba(98,198,255,.35),transparent 50%);opacity:0;transition:opacity .4s}
+.svc:hover::before{opacity:1}
+.svc>*{position:relative}
+.svc .ico{width:64px;height:64px;border-radius:20px;display:grid;place-items:center;background:#fff;color:var(--volt);margin-bottom:auto}
+.svc .ico svg{width:30px;height:30px}
+.svc h3{font-size:clamp(24px,2.1vw,36px);margin:clamp(20px,4vh,40px) 0 12px}
+.svc p{margin:0;color:#d5e1ff;font-size:16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.chips span{font:500 12px var(--mono);padding:7px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.3)}
+.svc.solid{background:#fff;color:var(--ink);border-color:#fff}
+.svc.solid p{color:var(--mute)}
+.svc.solid .ico{background:var(--volt);color:#fff}
+.svc.solid .chips span{border-color:var(--ice);color:var(--volt)}
+.svc.end{background:var(--ink);border-color:var(--ink);justify-content:space-between}
+.svc.end h3{font-size:clamp(34px,3.4vw,56px);margin:0}
+.svc.end .big-arrow{width:90px;height:90px;border-radius:50%;background:var(--sky);color:var(--ink);display:grid;place-items:center;transition:transform .6s var(--ease)}
+.svc.end:hover .big-arrow{transform:rotate(-45deg) scale(1.1)}
+
+/* ---------- шаги ---------- */
+.steps-sec{position:relative;padding-block:clamp(90px,12vw,180px);background:var(--paper)}
+.sec-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:20px 40px;margin-bottom:clamp(40px,6vw,90px)}
+.sec-head h2{font-size:clamp(36px,6vw,110px);max-width:10em}
+.sec-head p{max-width:26em;margin:0;color:var(--mute)}
+.sec-head .tag{color:var(--volt);margin-bottom:22px}
+.steps{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(16px,2vw,30px);padding-top:70px}
+.wire{position:absolute;left:0;right:0;top:20px;height:4px;display:flex;align-items:center}
+.wire .start{width:22px;height:22px;border-radius:50%;border:4px solid var(--volt);background:var(--paper);flex:none;z-index:1}
+.wire .line{flex:1;height:4px;background:var(--ice);position:relative;overflow:hidden}
+.wire .line i{position:absolute;inset:0;background:linear-gradient(90deg,var(--volt),var(--volt2) 80%,var(--ink));transform-origin:left;transform:scaleX(1)}
+.wire .plug{flex:none;display:flex;align-items:center}
+.wire .plug b{width:46px;height:26px;background:var(--ink);border-radius:5px}
+.wire .plug s{width:18px;height:20px;background:var(--volt);border-radius:3px;margin-left:3px;box-shadow:inset 0 0 0 4px var(--ink)}
+.wire .plug u{width:14px;height:14px;background:#c9d3ea;margin-left:2px;border-radius:1px}
+.step{position:relative;min-width:0}
+.step .n{font:400 clamp(60px,7vw,120px)/1 var(--display);color:transparent;-webkit-text-stroke:1.5px var(--volt);display:block;margin-bottom:18px;transition:color .4s}
+.step.on .n{color:var(--volt)}
+.step h3{font-size:clamp(22px,1.8vw,30px);margin-bottom:10px}
+.step p{margin:0;color:var(--mute);font-size:16px}
+.step .time{display:inline-block;margin-top:16px;font:600 12px var(--mono);letter-spacing:.08em;padding:7px 12px;border-radius:999px;background:var(--ink);color:#fff}
+
+/* ---------- 3D-печать ---------- */
+.print-sec{position:relative;background:var(--white);overflow:hidden}
+.print-in{min-height:100svh;display:grid;grid-template-columns:1fr 1.15fr;gap:clamp(30px,4vw,70px);align-items:center;padding-block:clamp(84px,9vh,120px) clamp(24px,4vh,60px)}
+.print-text{min-width:0}
+.print-text .tag{color:var(--volt);margin-bottom:22px}
+.print-text h2{font-size:clamp(34px,min(4.4vw,8vh),84px);margin-bottom:20px}
+.print-text h2 em{font-style:normal;color:var(--volt)}
+.print-text>p{color:var(--mute);margin:0 0 26px;max-width:34em}
+.plist{list-style:none;margin:0 0 24px;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.plist li{font:500 13px var(--mono);padding:9px 14px;border-radius:999px;border:1.5px solid var(--ice);color:var(--volt2);background:var(--paper)}
+.pnote{font-weight:600;margin:0 0 30px}
+.pstage{position:relative;aspect-ratio:1.15;min-width:0;border-radius:40px;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 30%,#fff,var(--ice) 70%)}
+.pstage .grid{position:absolute;left:-30%;right:-30%;bottom:-8%;height:60%;transform:perspective(500px) rotateX(62deg);transform-origin:bottom;
+  background-image:linear-gradient(rgba(18,56,255,.25) 1px,transparent 1px),linear-gradient(90deg,rgba(18,56,255,.25) 1px,transparent 1px);background-size:44px 44px;
+  -webkit-mask:linear-gradient(transparent,#000 60%);mask:linear-gradient(transparent,#000 60%)}
+.pstage .printer{position:absolute;left:4%;top:8%;width:84%;filter:drop-shadow(0 40px 40px rgba(10,36,196,.25))}
+.pstage .beam{position:absolute;left:0;right:0;height:2px;background:var(--sky);box-shadow:0 0 18px 4px var(--sky);top:70%;opacity:.9}
+.phud{position:absolute;right:16px;bottom:16px;display:flex;gap:14px;align-items:center;padding:14px 18px;border-radius:22px;background:var(--ink);color:#fff;box-shadow:0 20px 40px -20px rgba(3,8,32,.8)}
+.phud svg{width:64px;height:64px;flex:none}
+.phud small{display:block;font:500 10px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:#9fb0e0}
+.phud b{display:block;font:600 16px var(--mono);font-variant-numeric:tabular-nums;margin:2px 0 8px}
+.phud .bar{width:140px;height:4px;border-radius:4px;background:rgba(255,255,255,.15);overflow:hidden}
+.phud .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--sky),#fff)}
+.ptemp{position:absolute;left:16px;top:16px;padding:10px 14px;border-radius:16px;background:#fff;border:1px solid var(--ice);font:600 14px var(--mono)}
+.ptemp small{display:block;font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.gear-g{fill:none;stroke:rgba(255,255,255,.25);stroke-width:1.5}
+.gear-f{fill:var(--sky)}
+.loop .gclip{animation:gl 5s steps(30) infinite}
+@keyframes gl{from{transform:translateY(64px)}90%,to{transform:none}}
+.loop .phud .bar i{animation:gb 5s steps(30) infinite}
+@keyframes gb{90%,to{width:100%}}
+
+/* ---------- сборки ---------- */
+.builds-sec{position:relative;padding-block:clamp(90px,10vw,160px);background:var(--paper)}
+.stack{display:grid;gap:clamp(18px,2vw,28px)}
+.bcard{position:relative;display:grid;grid-template-columns:1fr 1.1fr;border-radius:clamp(26px,3vw,44px);overflow:hidden;background:#fff;border:1px solid var(--ice);box-shadow:0 40px 80px -50px rgba(10,36,196,.5);transform-origin:center top}
+.bcard .art{position:relative;min-height:340px;display:grid;place-items:center;overflow:hidden}
+.bcard .art svg{width:min(48%,230px);height:auto;filter:drop-shadow(0 40px 40px rgba(3,8,32,.35));transition:transform .8s var(--ease)}
+.bcard:hover .art svg{transform:rotate(-4deg) scale(1.06)}
+.bcard .art .name{position:absolute;left:24px;bottom:12px;font:400 clamp(44px,6vw,110px)/1 var(--display);color:rgba(255,255,255,.16);white-space:nowrap}
+.a1{background:radial-gradient(circle at 50% 110%,var(--sky),var(--volt) 60%)}
+.a2{background:radial-gradient(circle at 50% 110%,#a8dcff,#4d7bff 60%)}
+.a3{background:radial-gradient(circle at 50% 110%,var(--volt),var(--navy) 65%)}
+.badge{position:absolute;left:22px;top:22px;font:600 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;padding:8px 12px;border-radius:999px;background:#fff;color:var(--volt)}
+.bcard .body{padding:clamp(24px,3vw,48px);display:flex;flex-direction:column;min-width:0}
+.bcard h3{font-size:clamp(32px,3.4vw,58px)}
+.bcard .cls{font:500 13px var(--mono);color:var(--mute);margin:8px 0 24px}
+.spec{list-style:none;margin:0 0 22px;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:12px 24px}
+.spec li{border-top:1.5px solid var(--ice);padding-top:10px;min-width:0}
+.spec small{display:block;font:500 11px var(--mono);letter-spacing:.12em;color:var(--mute)}
+.spec b{font-weight:600}
+.fps{display:flex;align-items:center;gap:12px;font:500 12px var(--mono);color:var(--mute);margin-bottom:24px}
+.fps .bar{flex:1;height:6px;border-radius:6px;background:var(--ice);overflow:hidden}
+.fps .bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--sky),var(--volt))}
+.price{margin-top:auto;display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between}
+.price b{font:400 clamp(28px,2.6vw,42px)/1 var(--display);font-variant-numeric:tabular-nums}
+.price small{font:500 14px var(--body);color:var(--mute);margin-right:6px}
+.fan{transform-origin:center;transform-box:fill-box;animation:fan 1.4s linear infinite}
+.bcard:hover .fan{animation-duration:.3s}
+@keyframes fan{to{transform:rotate(360deg)}}
+.note{font:500 12px var(--mono);color:var(--mute);margin-top:22px}
+
+/* ---------- гиперпрыжок ---------- */
+.warp-wrap{background:var(--paper);padding-bottom:clamp(20px,3vw,40px)}
+.warp{position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 50%,#0b1d6e,var(--navy) 70%);color:#fff;isolation:isolate}
+.warp canvas{position:absolute;inset:0;width:100%;height:100%;z-index:-1}
+.warp-in{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding-block:120px}
+.warp .tag{color:var(--sky);margin-bottom:24px}
+.warp h2{font-size:clamp(38px,7.6vw,150px);max-width:11em}
+.warp p{max-width:34em;margin:28px 0 34px;color:#c8d5ff;font-size:clamp(16px,1.4vw,20px)}
+.route{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:40px;max-width:900px}
+.route span{font:500 13px var(--mono);padding:9px 14px;border-radius:999px;border:1px solid rgba(98,198,255,.35);background:rgba(255,255,255,.05)}
+
+/* ---------- контакты ---------- */
+.contact{position:relative;background:var(--volt);color:#fff;overflow:hidden;padding-block:clamp(90px,10vw,160px)}
+.contact::before{content:"";position:absolute;width:120vmax;height:120vmax;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;
+  background:repeating-radial-gradient(circle,transparent 0 60px,rgba(255,255,255,.07) 60px 61px);pointer-events:none}
+.contact::after{content:"";position:absolute;width:120vmax;height:120vmax;left:50%;top:50%;margin:-60vmax 0 0 -60vmax;border-radius:50%;
+  background:conic-gradient(from 0deg,rgba(98,198,255,.35),transparent 18%);animation:sweep 6s linear infinite;pointer-events:none}
+@keyframes sweep{to{transform:rotate(360deg)}}
+.contact .wrap{position:relative;z-index:1}
+.contact .tag{color:var(--sky);margin-bottom:22px}
+.contact h2{font-size:clamp(42px,9vw,180px)}
+.phone-big{display:inline-flex;flex-wrap:wrap;margin:clamp(24px,4vw,50px) 0 clamp(20px,3vw,40px);font:400 clamp(30px,6.4vw,120px)/1 var(--display);color:#fff}
+.phone-big .ch{transition:transform .5s var(--ease),color .3s;transition-delay:calc(var(--i)*18ms)}
+.phone-big:hover .ch{transform:translateY(-14%);color:var(--sky)}
+.cinfo{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;border-top:1.5px solid rgba(255,255,255,.3);padding-top:26px;margin-bottom:34px}
+.cinfo small{display:block;font:500 11px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:#bcd0ff;margin-bottom:6px}
+.cinfo b{font-weight:500;font-size:clamp(17px,1.5vw,22px)}
+.cact{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.copied{font:500 13px var(--mono);color:var(--sky)}
+
+/* ---------- FAQ ---------- */
+.faq-sec{background:var(--paper);padding-block:clamp(90px,10vw,150px)}
+.faq-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(30px,5vw,90px)}
+.faq details{border-top:1.5px solid var(--ink)}
+.faq details:last-child{border-bottom:1.5px solid var(--ink)}
+.faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;gap:20px;align-items:center;padding:26px 0;font:400 clamp(19px,1.8vw,28px)/1.2 var(--display)}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary i{flex:none;width:44px;height:44px;border-radius:50%;border:1.5px solid var(--ink);position:relative;transition:background .4s,transform .5s var(--ease)}
+.faq summary i::before,.faq summary i::after{content:"";position:absolute;left:50%;top:50%;width:14px;height:2px;margin:-1px 0 0 -7px;background:var(--ink);transition:transform .5s var(--ease),background .3s}
+.faq summary i::after{transform:rotate(90deg)}
+.faq details[open] summary i{background:var(--volt);border-color:var(--volt);transform:rotate(180deg)}
+.faq details[open] summary i::before,.faq details[open] summary i::after{background:#fff}
+.faq details[open] summary i::after{transform:none}
+.faq details p{margin:0 0 26px;color:var(--mute);max-width:60ch}
+
+/* ---------- подвал ---------- */
+footer{background:var(--ink);color:#fff;overflow:hidden;padding-top:clamp(50px,6vw,90px)}
+.giant{font:400 15vw/0.86 var(--display);letter-spacing:-.03em;white-space:nowrap;display:flex;justify-content:center;width:max-content;margin:0 auto;padding-bottom:.04em}
+.giant .ch:nth-child(n+6){color:var(--sky)}
+.foot{display:flex;flex-wrap:wrap;gap:16px 30px;justify-content:space-between;align-items:center;padding-block:28px calc(28px + env(safe-area-inset-bottom,0px));border-top:1px solid rgba(255,255,255,.15);font-size:14px;color:#aab6dc}
+.foot a{color:#fff;border-bottom:1px solid rgba(255,255,255,.3)}
+
+/* ---------- адаптив ---------- */
+@media (max-width:1180px){
+  .links{display:none}
+  .call{margin-left:auto}
+}
+@media (max-width:1100px){
+  .hero-bottom{grid-template-columns:1fr 1fr}
+  .hero-bottom .lead{grid-column:1/-1}
+}
+@media (max-width:900px){
+  .call{display:none}
+  .burger{display:grid}
+  .scroll-hint{display:none}
+  .portal-in{min-height:0}
+  .track{width:auto;display:grid;grid-template-columns:1fr 1fr;padding-right:0}
+  .svc{width:auto;min-height:0}
+  .svc .ico{margin-bottom:0}
+  .steps{grid-template-columns:1fr 1fr;padding-top:0;padding-left:46px;gap:40px 24px}
+  .wire{left:9px;right:auto;top:0;bottom:0;width:4px;height:auto;flex-direction:column}
+  .wire .line{width:4px;height:auto}
+  .wire .line i{transform-origin:top}
+  .wire .plug{flex-direction:column}
+  .wire .plug b{width:26px;height:40px}
+  .wire .plug s{width:20px;height:16px;margin:3px 0 0}
+  .wire .plug u{display:none}
+  .print-in{grid-template-columns:1fr;min-height:0}
+  .pstage{order:-1}
+  .bcard{grid-template-columns:1fr}
+  .bcard .art{min-height:260px}
+  .faq-grid{grid-template-columns:1fr}
+  .cinfo{grid-template-columns:1fr 1fr}
+}
+@media (min-width:600px) and (max-width:900px) and (min-aspect-ratio:4/5){
+  .print-in{grid-template-columns:1fr 1fr}
+  .pstage{order:0}
+}
+@media (max-width:600px){
+  .hero{min-height:0;padding-top:104px}
+  .hero-top .tag{letter-spacing:.1em;font-size:11px}
+  .hero-top .tag::before{display:none}
+  .hero-bottom{grid-template-columns:1fr}
+  .ctas .btn{flex:1 1 100%}
+  .stats{justify-content:space-between}
+  .track{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr}
+  .spec{grid-template-columns:1fr 1fr}
+  .cinfo{grid-template-columns:1fr}
+  .phud{left:12px;right:12px;bottom:12px;padding:12px}
+  .phud svg{width:46px;height:46px}
+  .phud .bar{width:100%}
+  .ptemp{display:none}
+  .warp-in{min-height:0;padding-block:90px}
+  .r2{-webkit-text-stroke-width:1px}
+}
+@media (max-width:360px){
+  :root{--pad:12px}
+  body{font-size:15px}
+  header{padding-top:calc(env(safe-area-inset-top,0px) + 8px)}
+  .nav{padding:6px 6px 6px 12px}
+  .logo{width:100px}
+  .burger{width:40px;height:40px}
+  .btn{padding:15px 16px;font-size:14px;white-space:normal;text-align:center}
+  .svc{border-radius:24px;padding:20px}
+  .svc h3{margin-top:22px}
+  .spec{grid-template-columns:1fr}
+  .phone-big{font-size:clamp(22px,9vw,34px)}
+  .plist li{font-size:11.5px;padding:7px 10px}
+  .route span{font-size:11.5px}
+  .tag{letter-spacing:.12em;font-size:11px}
+}
+@media (max-height:520px) and (orientation:landscape){
+  .hero{min-height:0}
+  .portal-in,.print-in,.warp-in{min-height:0}
+}
+@media (min-width:2000px){
+  body{font-size:20px}
+  .logo{width:160px}
+  .links a{font-size:18px}
+  .btn{padding:22px 32px;font-size:18px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  #intro{display:none!important}
+}
+</style>
+</head>
+<body>
+
+<div id="intro" aria-hidden="true">
+  <div class="intro-half t"></div><div class="intro-half b"></div>
+  <div class="intro-core">
+    <div class="intro-name"><span>ФИКС</span><span>ТАЙМ</span></div>
+    <div class="intro-wire"><b></b><i id="introLine"></i><em></em></div>
+    <div class="intro-count" id="introCount">ЗАПУСК 000</div>
+  </div>
+</div>
+
+<div class="cur" aria-hidden="true"></div>
+<div class="cur-ring" aria-hidden="true"><span></span></div>
+
+<header id="hdr">
+  <div class="wrap">
+    <nav class="nav" aria-label="Основное меню">
+      <a class="logo" href="#top" aria-label="Фикс Тайм, на главную"><img src="../img/logo.png" alt="Фикс Тайм — компьютерная мастерская" width="900" height="356"></a>
+      <div class="links">
+        <a href="#services" data-t="Услуги"><span>Услуги</span></a>
+        <a href="#steps" data-t="Как работаем"><span>Как работаем</span></a>
+        <a href="#print" data-t="3D-печать"><span>3D-печать</span></a>
+        <a href="#builds" data-t="Сборки"><span>Сборки</span></a>
+        <a href="#repair" data-t="Ремонт"><span>Ремонт</span></a>
+        <a href="#contacts" data-t="Контакты"><span>Контакты</span></a>
+      </div>
+      <a class="call" href="#contacts"><i></i>+7 (978) 287-31-04</a>
+      <button class="burger" id="burger" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="mmenu"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><path d="M4 8h16M4 16h10"/></svg></button>
+    </nav>
+    <div class="mmenu" id="mmenu" hidden>
+      <a href="#services">Услуги</a>
+      <a href="#steps">Как работаем</a>
+      <a href="#print">3D-печать</a>
+      <a href="#builds">Сборки</a>
+      <a href="#repair">Ремонт</a>
+      <a href="#contacts">Контакты</a>
+      <div class="mm-info">СИМФЕРОПОЛЬ · ЕЖЕДНЕВНО 9–19</div>
+      <a class="mm-phone" href="#contacts">+7 (978) 287-31-04</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero" id="top">
+    <canvas id="ptext" aria-hidden="true"></canvas>
+    <div class="wrap">
+      <div class="hero-top">
+        <span class="tag">Ремонт · апгрейд · сборка · 3D-печать</span>
+        <span class="loc">Симферополь · с 2026 года</span>
+      </div>
+      <h1 class="sr">Ремонт компьютеров</h1>
+      <div class="ptext-space" id="ptSpace"></div>
+      <div class="hero-bottom">
+        <p class="lead">Ремонтируем, прокачиваем и собираем компьютеры <b>в Симферополе</b>. Каждую сборку гоняем стресс-тестом, прежде чем она уйдёт к вам.</p>
+        <div class="ctas">
+          <a class="btn btn-volt" href="#builds">Собрать ПК под заказ <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          <a class="btn btn-line" href="#builds">Компьютеры в продаже</a>
+          <a class="btn btn-line" href="#repair">Отправить на ремонт</a>
+        </div>
+        <div class="stats">
+          <div class="stat"><b>2026</b><span>работаем с</span></div>
+          <div class="stat"><b>3D</b><span>печать деталей</span></div>
+          <div class="stat"><b>9–19</b><span>ежедневно</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-hint" aria-hidden="true">листайте</div>
+  </section>
+
+  <div class="ribbons" aria-hidden="true">
+    <div class="ribbon r1" data-dir="-1"><span>Сборка под заказ</span><span>Замена термопасты</span><span>Апгрейд видеокарты</span><span>Восстановление данных</span><span>Чистка от пыли</span><span>Ремонт принтеров</span><span>3D-печать запчастей</span><span>Моддинг</span><span>Ремонт ноутбуков</span><span>Водяное охлаждение</span></div>
+    <div class="ribbon r2" data-dir="1"><span>Ремонт</span><span>Апгрейд</span><span>Сборка</span><span>3D-печать</span><span>Моддинг</span><span>Ремонт принтеров</span><span>Ремонт</span><span>Апгрейд</span><span>Сборка</span><span>3D-печать</span></div>
+  </div>
+
+  <section class="portal" id="services">
+    <div class="portal-bg"></div>
+    <div class="portal-in">
+      <div class="wrap portal-head">
+        <div><span class="tag" style="color:var(--sky);margin-bottom:22px">Что мы делаем</span><h2 class="split">Всё, что нужно компьютеру</h2></div>
+        <p>Приносите в мастерскую или отправляйте транспортной компанией. Диагностика бесплатная, если делаете ремонт у нас.</p>
+      </div>
+      <div class="wrap" style="max-width:none">
+        <div class="track" id="track">
+          <article class="svc solid" data-cursor="Собрать">
+            <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><circle cx="12" cy="14" r="3"/><path d="M9 6h6"/></svg></div>
+            <h3>Сборка ПК под заказ</h3>
+            <p>Подберём железо под ваши игры, монтаж или работу и уложимся в бюджет. Кабель-менеджмент, тихие кулеры, подсветка по желанию.</p>
+            <div class="chips"><span>игровые</span><span>для монтажа</span><span>для офиса</span><span>белые сборки</span></div>
+          </article>
+          <article class="svc" data-cursor="Починить">
+            <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg></div>
+            <h3>Ремонт и диагностика</h3>
+            <p>Не включается, перегревается, шумит, выключается в играх. Найдём причину, скажем цену до начала работ и дадим гарантию на ремонт.</p>
+            <div class="chips"><span>ПК</span><span>ноутбуки</span><span>моноблоки</span><span>принтеры</span></div>
+          </article>
+          <article class="svc" data-cursor="Ускорить">
+            <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div>
+            <h3>Апгрейд</h3>
+            <p>Меняем видеокарту, процессор, память, ставим SSD. Старое железо можно сдать в зачёт.</p>
+          </article>
+          <article class="svc" data-cursor="Остудить">
+            <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/><circle cx="12" cy="12" r="3"/></svg></div>
+            <h3>Чистка и обслуживание</h3>
+            <p>Пыль, новая термопаста и термопрокладки. Обычно минус 10–20 °C на процессоре.</p>
+          </article>
+          <article class="svc" data-cursor="Спасти">
+            <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></div>
+            <h3>Данные и система</h3>
+            <p>Восстановим файлы с умершего диска, перенесём систему и файлы на новый SSD.</p>
+          </article>
+          <a class="svc end" href="#print" data-cursor="Дальше">
+            <h3>А ещё печатаем детали на 3D-принтере</h3>
+            <span class="big-arrow"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="steps-sec" id="steps">
+    <div class="wrap">
+      <div class="sec-head">
+        <div><span class="tag">Как проходит сборка</span><h2 class="split">От заявки до первого запуска</h2></div>
+        <p>Провод из нашего логотипа ведёт по всем шагам: от вашей заявки до компьютера, который включается с первого раза.</p>
+      </div>
+      <div class="steps" id="stepsBox">
+        <div class="wire" aria-hidden="true"><span class="start"></span><span class="line"><i id="wireFill"></i></span><span class="plug"><b></b><s></s><u></u></span></div>
+        <div class="step"><span class="n">01</span><h3>Заявка</h3><p>Пишете, во что играете или в чём работаете, и сколько готовы потратить.</p><span class="time">15 минут</span></div>
+        <div class="step"><span class="n">02</span><h3>Подбор</h3><p>Присылаем две-три конфигурации с ценами и честно говорим, где можно сэкономить.</p><span class="time">в тот же день</span></div>
+        <div class="step"><span class="n">03</span><h3>Сборка и тест</h3><p>Собираем, укладываем кабели, гоняем стресс-тест и присылаем видео с температурами.</p><span class="time">1–3 дня</span></div>
+        <div class="step"><span class="n">04</span><h3>Выдача</h3><p>Забираете в мастерской в Симферополе или получаете транспортной компанией.</p><span class="time">готово</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="print-sec" id="print">
+    <div class="wrap print-in">
+      <div class="print-text">
+        <span class="tag">Моддинг и 3D-печать</span>
+        <h2 class="split">Нет нужной детали? <em>Напечатаем</em></h2>
+        <p>Сломалась защёлка, потерялась заглушка, провисает видеокарта? Смоделируем и распечатаем деталь на 3D-принтере, а не будем ждать её неделями. Делаем и моддинг: свои панели, подсветку, надписи и детали для корпуса.</p>
+        <ul class="plist">
+          <li>крепления видеокарт</li><li>заглушки и решётки</li><li>ножки и кронштейны</li><li>рамки вентиляторов</li><li>детали для моддинга</li><li>корпуса для электроники</li>
+        </ul>
+        <p class="pnote">Чиним и сами принтеры: обычные и 3D.</p>
+        <a class="btn btn-volt" href="#contacts">Прислать фото детали <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+      <div class="pstage" id="pstage" data-cursor="Печать">
+        <div class="grid" aria-hidden="true"></div>
+        <img class="printer" id="printerImg" src="../img/printer.png" alt="3D-принтер с системой подачи нескольких пластиков" width="683" height="475" loading="lazy">
+        <div class="beam" id="pbeam" aria-hidden="true"></div>
+        <div class="ptemp" aria-hidden="true"><small>сопло</small>220 °C</div>
+        <div class="phud" aria-hidden="true">
+          <svg viewBox="0 0 64 64">
+            <defs><clipPath id="gc"><rect class="gclip" id="gclip" x="0" y="0" width="64" height="64"/></clipPath></defs>
+            <path class="gear-g" d="M28 4h8l1.5 7.2a21 21 0 0 1 6 2.5l6.2-4 5.6 5.6-4 6.2a21 21 0 0 1 2.5 6L61 28v8l-7.2 1.5a21 21 0 0 1-2.5 6l4 6.2-5.6 5.6-6.2-4a21 21 0 0 1-6 2.5L36 61h-8l-1.5-7.2a21 21 0 0 1-6-2.5l-6.2 4-5.6-5.6 4-6.2a21 21 0 0 1-2.5-6L3 36v-8l7.2-1.5a21 21 0 0 1 2.5-6l-4-6.2 5.6-5.6 6.2 4a21 21 0 0 1 6-2.5zM32 22a10 10 0 1 0 0 20a10 10 0 1 0 0-20z"/>
+            <path class="gear-f" clip-path="url(#gc)" fill-rule="evenodd" d="M28 4h8l1.5 7.2a21 21 0 0 1 6 2.5l6.2-4 5.6 5.6-4 6.2a21 21 0 0 1 2.5 6L61 28v8l-7.2 1.5a21 21 0 0 1-2.5 6l4 6.2-5.6 5.6-6.2-4a21 21 0 0 1-6 2.5L36 61h-8l-1.5-7.2a21 21 0 0 1-6-2.5l-6.2 4-5.6-5.6 4-6.2a21 21 0 0 1-2.5-6L3 36v-8l7.2-1.5a21 21 0 0 1 2.5-6l-4-6.2 5.6-5.6 6.2 4a21 21 0 0 1 6-2.5zM32 22a10 10 0 1 0 0 20a10 10 0 1 0 0-20z"/>
+          </svg>
+          <div><small>печатаем деталь</small><b id="layerNo">слой 240 / 240</b><span class="bar"><i id="layerBar" style="width:100%"></i></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="builds-sec" id="builds">
+    <div class="wrap">
+      <div class="sec-head">
+        <div><span class="tag">Компьютеры в продаже</span><h2 class="split">Готовые сборки</h2></div>
+        <p>Уже прошли стресс-тест, можно забрать сегодня. Любую поменяем под вас: память, диск, корпус, цвет.</p>
+      </div>
+      <div class="stack" id="stack">
+        <article class="bcard" data-cursor="Хочу">
+          <div class="art a1"><span class="badge">в наличии</span><span class="name" aria-hidden="true">PULSAR</span>
+            <svg viewBox="0 0 120 160" aria-hidden="true"><rect x="10" y="6" width="100" height="148" rx="10" fill="#fff"/><rect x="20" y="16" width="56" height="128" rx="6" fill="#e6eeff"/><g class="fan"><circle cx="48" cy="48" r="20" fill="none" stroke="#62c6ff" stroke-width="3"/><path d="M48 48v-16M48 48l14 8M48 48l-14 8" stroke="#1238ff" stroke-width="5" stroke-linecap="round"/></g><g class="fan"><circle cx="48" cy="104" r="20" fill="none" stroke="#62c6ff" stroke-width="3"/><path d="M48 104v-16M48 104l14 8M48 104l-14 8" stroke="#1238ff" stroke-width="5" stroke-linecap="round"/></g><rect x="84" y="20" width="16" height="4" rx="2" fill="#1238ff"/><circle cx="92" cy="140" r="4" fill="#62c6ff"/></svg>
+          </div>
+          <div class="body">
+            <h3>Пульсар</h3><div class="cls">Full HD · киберспорт и учёба</div>
+            <ul class="spec"><li><small>CPU</small><b>Ryzen 5 7500F</b></li><li><small>GPU</small><b>RTX 5060 8 ГБ</b></li><li><small>RAM</small><b>32 ГБ DDR5</b></li><li><small>SSD</small><b>1 ТБ NVMe</b></li></ul>
+            <div class="fps"><span>CS2</span><span class="bar"><i style="width:72%"></i></span><span>~300 fps</span></div>
+            <div class="price"><b><small>от</small>89 900 ₽</b><a class="btn btn-line" href="#contacts">Хочу этот</a></div>
+          </div>
+        </article>
+        <article class="bcard" data-cursor="Хочу">
+          <div class="art a2"><span class="badge">хит</span><span class="name" aria-hidden="true">QUASAR</span>
+            <svg viewBox="0 0 120 160" aria-hidden="true"><rect x="10" y="6" width="100" height="148" rx="10" fill="#fff"/><rect x="20" y="16" width="56" height="128" rx="6" fill="#cfdcff"/><g class="fan"><circle cx="48" cy="40" r="17" fill="none" stroke="#1238ff" stroke-width="3"/><path d="M48 40V27M48 40l11 7M48 40l-11 7" stroke="#62c6ff" stroke-width="5" stroke-linecap="round"/></g><g class="fan"><circle cx="48" cy="80" r="17" fill="none" stroke="#1238ff" stroke-width="3"/><path d="M48 80V67M48 80l11 7M48 80l-11 7" stroke="#62c6ff" stroke-width="5" stroke-linecap="round"/></g><g class="fan"><circle cx="48" cy="120" r="17" fill="none" stroke="#1238ff" stroke-width="3"/><path d="M48 120v-13M48 120l11 7M48 120l-11 7" stroke="#62c6ff" stroke-width="5" stroke-linecap="round"/></g><rect x="84" y="20" width="16" height="4" rx="2" fill="#62c6ff"/><circle cx="92" cy="140" r="4" fill="#1238ff"/></svg>
+          </div>
+          <div class="body">
+            <h3>Квазар</h3><div class="cls">2K · новые игры на высоких</div>
+            <ul class="spec"><li><small>CPU</small><b>Ryzen 7 9700X</b></li><li><small>GPU</small><b>RTX 5070 12 ГБ</b></li><li><small>RAM</small><b>32 ГБ DDR5 6000</b></li><li><small>SSD</small><b>2 ТБ NVMe</b></li></ul>
+            <div class="fps"><span>Cyberpunk</span><span class="bar"><i style="width:84%"></i></span><span>~100 fps</span></div>
+            <div class="price"><b><small>от</small>154 900 ₽</b><a class="btn btn-volt" href="#contacts">Хочу этот</a></div>
+          </div>
+        </article>
+        <article class="bcard" data-cursor="Хочу">
+          <div class="art a3"><span class="badge">под заказ</span><span class="name" aria-hidden="true">NOVA</span>
+            <svg viewBox="0 0 120 160" aria-hidden="true"><rect x="10" y="6" width="100" height="148" rx="10" fill="#0a1238" stroke="#1238ff" stroke-width="2"/><rect x="20" y="16" width="80" height="128" rx="6" fill="#0b1d6e"/><g class="fan"><circle cx="60" cy="50" r="24" fill="none" stroke="#62c6ff" stroke-width="3"/><path d="M60 50V31M60 50l16 10M60 50l-16 10" stroke="#62c6ff" stroke-width="6" stroke-linecap="round"/></g><rect x="30" y="92" width="60" height="12" rx="3" fill="#1238ff"/><rect x="30" y="112" width="60" height="6" rx="3" fill="#62c6ff" opacity=".6"/><circle cx="96" cy="140" r="4" fill="#62c6ff"/></svg>
+          </div>
+          <div class="body">
+            <h3>Сверхновая</h3><div class="cls">4K · стримы и монтаж</div>
+            <ul class="spec"><li><small>CPU</small><b>Ryzen 7 9800X3D</b></li><li><small>GPU</small><b>RTX 5080 16 ГБ</b></li><li><small>RAM</small><b>64 ГБ DDR5 6000</b></li><li><small>SSD</small><b>4 ТБ NVMe</b></li></ul>
+            <div class="fps"><span>4K Ultra</span><span class="bar"><i style="width:94%"></i></span><span>~120 fps</span></div>
+            <div class="price"><b><small>от</small>289 900 ₽</b><a class="btn btn-line" href="#contacts">Хочу этот</a></div>
+          </div>
+        </article>
+      </div>
+      <p class="note">* В прототипе цены и FPS для примера.</p>
+    </div>
+  </section>
+
+  <section class="warp-wrap" id="repair">
+    <div class="warp" id="warpBox">
+      <canvas id="warp" aria-hidden="true"></canvas>
+      <div class="wrap warp-in">
+        <span class="tag">Ремонт из других городов</span>
+        <h2 class="split">Живёте не в Симферополе? Отправьте компьютер к нам</h2>
+        <p>Упакуйте ПК или ноутбук, сдайте в транспортную компанию, и мы заберём его со склада. Вернём тем же путём, уже исправным.</p>
+        <div class="route"><span>вы оставляете заявку</span><span>→ сдаёте в ТК</span><span>→ диагностика и цена</span><span>→ ремонт</span><span>→ обратно к вам</span></div>
+        <a class="btn btn-white" id="warpBtn" href="#contacts">Отправить на ремонт <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact" id="contacts">
+    <div class="wrap">
+      <span class="tag">Контакты</span>
+      <h2 class="split">Мастерская в Симферополе</h2>
+      <a class="phone-big split-ch" id="phoneBig" href="tel:+79782873104" data-cursor="Звонить">+7 (978) 287-31-04</a>
+      <div class="cinfo">
+        <div><small>Адрес</small><b>адрес уточняется</b></div>
+        <div><small>Часы</small><b>ежедневно с 9 до 19</b></div>
+        <div><small>Город</small><b>Симферополь, новые города скоро</b></div>
+      </div>
+      <div class="cact">
+        <button class="btn btn-white" id="copyBtn" type="button">Скопировать телефон</button>
+        <a class="btn btn-line" href="#faq" style="border-color:#fff;color:#fff">Частые вопросы</a>
+        <span class="copied" id="copied" hidden>Скопировано</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="faq-sec" id="faq">
+    <div class="wrap faq-grid">
+      <div class="sec-head" style="margin:0;display:block"><span class="tag">Частые вопросы</span><h2 class="split" style="font-size:clamp(36px,4.6vw,84px)">Спрашивают чаще всего</h2></div>
+      <div class="faq">
+        <details open><summary>Сколько стоит диагностика?<i></i></summary><p>Бесплатно, если ремонт делаете у нас. Если решите не ремонтировать, диагностика оплачивается по прайсу мастерской.</p></details>
+        <details><summary>Какая гарантия на сборку?<i></i></summary><p>На комплектующие действует гарантия производителя, на саму сборку и работу даём свою. Если что-то случится, разбираемся мы, а не вы с магазинами.</p></details>
+        <details><summary>Можно собрать ПК из моих комплектующих?<i></i></summary><p>Да. Проверим совместимость, соберём, обновим BIOS и прогоним стресс-тест.</p></details>
+        <details><summary>Как отправить компьютер из другого города?<i></i></summary><p>Оставьте заявку, и мы подскажем, как упаковать и в какую транспортную компанию сдать. Доставку туда и обратно можно оплатить при получении.</p></details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="giant split-ch" id="giant" aria-label="Фикс Тайм">ФИКСТАЙМ</div>
+  <div class="wrap foot">
+    <span>Симферополь · ежедневно с 9 до 19 · +7 (978) 287-31-04</span>
+    <span><a href="../">Вариант 1</a> · прототип 2</span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+(()=>{
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+if('scrollRestoration' in history) history.scrollRestoration='manual';
+if(!location.hash) scrollTo(0,0);
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fine=matchMedia('(pointer:fine)').matches;
+const hasG=typeof gsap!=='undefined' && typeof ScrollTrigger!=='undefined';
+let DPR=Math.min(devicePixelRatio||1,2);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+/* ---------- разбивка текста на буквы ---------- */
+function split(el){
+  const words=el.textContent.trim().split(/\s+/); el.setAttribute('aria-label',el.textContent.trim());
+  // сохраняем <em> внутри заголовка
+  const emText=(el.querySelector('em')||{}).textContent||'';
+  let i=0; el.innerHTML=words.map(w=>{
+    const isEm=emText && emText.split(/\s+/).includes(w);
+    const chars=[...w].map(c=>`<span class="ch" style="--i:${i++}">${c}</span>`).join('');
+    return `<span class="w" aria-hidden="true">${isEm?'<em>'+chars+'</em>':chars}</span>`;
+  }).join(' ');
+}
+$$('.split').forEach(split);
+$$('.split-ch').forEach(el=>{const t=el.textContent.trim(); el.setAttribute('aria-label',el.getAttribute('aria-label')||t);
+  el.innerHTML=[...t].map((c,i)=>`<span class="ch" aria-hidden="true" style="--i:${i}">${c===' '?'&nbsp;':c}</span>`).join('');});
+
+/* ---------- плавная прокрутка ---------- */
+let lenis=null, vel=0;
+if(!reduce && typeof Lenis!=='undefined'){
+  lenis=new Lenis({duration:1.15,easing:t=>1-Math.pow(1-t,4),smoothWheel:true}); window.__lenis=lenis;
+  lenis.on('scroll',e=>{vel=e.velocity||0; hasG&&ScrollTrigger.update();});
+  if(hasG){gsap.ticker.add(t=>lenis.raf(t*1000));gsap.ticker.lagSmoothing(0);}
+  else{const raf=t=>{lenis.raf(t);requestAnimationFrame(raf)};requestAnimationFrame(raf);}
+}
+let lastY=scrollY;
+addEventListener('scroll',()=>{ if(!lenis) vel=scrollY-lastY;
+  const h=$('#hdr'); if(scrollY>lastY+4 && scrollY>200 && mmenu.hidden) h.classList.add('hide'); else if(scrollY<lastY-4) h.classList.remove('hide'); lastY=scrollY; },{passive:true});
+$$('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{const id=a.getAttribute('href'); const t=id.length>1&&$(id); if(!t)return;
+  e.preventDefault(); setMenu(false); lenis?lenis.scrollTo(t,{offset:0,duration:1.6}):t.scrollIntoView({behavior:reduce?'auto':'smooth'}); }));
+
+/* ---------- курсор ---------- */
+const cur=$('.cur'), ring=$('.cur-ring'), ringT=ring.querySelector('span');
+let mx=innerWidth/2,my=innerHeight/2,rx=mx,ry=my;
+addEventListener('pointermove',e=>{mx=e.clientX;my=e.clientY;cur.style.transform=`translate(${mx}px,${my}px)`;},{passive:true});
+document.addEventListener('pointerover',e=>{const c=e.target.closest('[data-cursor]'); const l=e.target.closest('a,button,summary');
+  ring.classList.toggle('big',!!c); ringT.textContent=c?c.dataset.cursor:''; ring.classList.toggle('link',!c&&!!l);});
+
+/* ---------- мобильное меню ---------- */
+const burger=$('#burger'), mmenu=$('#mmenu');
+function setMenu(open){ mmenu.hidden=!open; burger.setAttribute('aria-expanded',open); burger.setAttribute('aria-label',open?'Закрыть меню':'Открыть меню');
+  burger.querySelector('path').setAttribute('d',open?'M6 6l12 12M18 6L6 18':'M4 8h16M4 16h10');
+  if(open){$('#hdr').classList.remove('hide'); hasG&&gsap.from('#mmenu a,#mmenu .mm-info',{y:30,opacity:0,stagger:.04,duration:.5,ease:'power3.out'});} }
+burger.addEventListener('click',()=>setMenu(mmenu.hidden));
+addEventListener('keydown',e=>{if(e.key==='Escape')setMenu(false);});
+
+/* ---------- текст из частиц ---------- */
+const hero=$('.hero'), pc=$('#ptext'), space=$('#ptSpace');
+const px=pc.getContext && pc.getContext('2d');
+if(!px) document.documentElement.classList.add('no-canvas');
+let pts=[], released=reduce, releaseT=0, st=4, pW=0, pH=0, heroVisible=true;
+const COLORS=['#060b26','#1238ff'];
+const pm={x:-1e4,y:-1e4};
+hero.addEventListener('pointermove',e=>{const r=pc.getBoundingClientRect();pm.x=e.clientX-r.left;pm.y=e.clientY-r.top;});
+hero.addEventListener('pointerleave',()=>{pm.x=pm.y=-1e4;});
+hero.addEventListener('touchmove',e=>{const r=pc.getBoundingClientRect(),t=e.touches[0];pm.x=t.clientX-r.left;pm.y=t.clientY-r.top;},{passive:true});
+hero.addEventListener('touchend',()=>{pm.x=pm.y=-1e4;});
+function buildText(){
+  if(!px) return;
+  const lines=['РЕМОНТ','КОМПЬЮТЕРОВ'];
+  const o=document.createElement('canvas').getContext('2d',{willReadFrequently:true});
+  o.font='400 100px "Dela Gothic One"';
+  const sw=space.clientWidth; if(sw<20){ setTimeout(buildText,300); return; }
+  const f2=Math.floor(100*sw/o.measureText(lines[1]).width*0.995);
+  const f1=Math.floor(Math.min(100*sw/o.measureText(lines[0]).width*0.995, f2*2.1, innerHeight*0.3));
+  const fs=f2, l1=f1*0.96, l2=f2*0.98;
+  space.style.height=Math.ceil(l1+l2)+'px';
+  const hr=hero.getBoundingClientRect(); pW=hr.width; pH=hr.height;
+  pc.width=pW*DPR; pc.height=pH*DPR;
+  const sr=space.getBoundingClientRect(); const ox=sr.left-hr.left, oy=sr.top-hr.top;
+  o.canvas.width=Math.ceil(sw); o.canvas.height=Math.ceil(l1+l2);
+  o.textBaseline='middle';
+  o.font=`400 ${f1}px "Dela Gothic One"`; o.fillStyle='#f00'; o.fillText(lines[0],0,l1*0.54);
+  o.font=`400 ${f2}px "Dela Gothic One"`; o.fillStyle='#00f'; o.fillText(lines[1],0,l1+l2*0.52);
+  const d=o.getImageData(0,0,o.canvas.width,o.canvas.height).data, W=o.canvas.width;
+  st=Math.max(3,Math.round(fs/24));
+  const homes=[];
+  for(let y=0;y<o.canvas.height;y+=st) for(let x=0;x<W;x+=st){const k=(y*W+x)*4; if(d[k+3]>130) homes.push([ox+x,oy+y,d[k]>d[k+2]?0:1]);}
+  const old=pts; pts=homes.map((h,i)=>{ const p=old[i]||(()=>{const a=Math.random()*6.283,r=Math.max(pW,pH)*(0.6+Math.random()*.6);
+      return {x:pW/2+Math.cos(a)*r,y:pH/2+Math.sin(a)*r,vx:0,vy:0,dx:(Math.random()-.5)*2,dy:(Math.random()-.2)*2,rot:(Math.random()-.5)*2,d:0};})();
+    p.hx=h[0];p.hy=h[1];p.c=h[2];p.d=(h[0]/pW)*0.7+Math.random()*0.25; if(reduce){p.x=p.hx;p.y=p.hy;} return p;});
+}
+function drawText(t){
+  if(!px||!heroVisible) return;
+  const sc=clamp(scrollY/(hero.offsetHeight*0.85),0,1);
+  const since=released?(t-releaseT)/1000:-1;
+  px.setTransform(DPR,0,0,DPR,0,0); px.clearRect(0,0,pW,pH);
+  const R=Math.max(70,pW*0.06), R2=R*R, s=st*0.66;
+  const b0=[],b1=[];
+  for(const p of pts){
+    if(!reduce){
+      let k=0;
+      if(since>=0){ const local=since-p.d; k=local>0?Math.min(.085,.012+local*.09):0; }
+      if(k===0 && !released){ // вихрь до старта
+        const ax=p.x-pW/2, ay=p.y-pH/2; p.vx+=-ay*0.0009-ax*0.0006; p.vy+=ax*0.0009-ay*0.0006;
+      }
+      const tx=p.hx+p.dx*sc*pW*0.55, ty=p.hy+p.dy*sc*pH*0.7-sc*120;
+      p.vx+=(tx-p.x)*k; p.vy+=(ty-p.y)*k;
+      const ddx=p.x-pm.x, ddy=p.y-pm.y, d2=ddx*ddx+ddy*ddy;
+      if(d2<R2&&d2>1){const dd=Math.sqrt(d2), f=(1-dd/R)*5.5; p.vx+=ddx/dd*f; p.vy+=ddy/dd*f;}
+      p.vx*=.84; p.vy*=.84; p.x+=p.vx; p.y+=p.vy;
+    }
+    (p.c?b1:b0).push(p);
+  }
+  px.globalAlpha=1-sc*0.9;
+  for(let c=0;c<2;c++){ px.fillStyle=COLORS[c]; const arr=c?b1:b0;
+    for(const p of arr){ const sp=Math.min(3,Math.abs(p.vx)+Math.abs(p.vy))*0.25; px.fillRect(p.x-s/2,p.y-s/2,s+sp,s+sp);} }
+}
+if('IntersectionObserver' in window) new IntersectionObserver(es=>{heroVisible=es[0].isIntersecting;}).observe(hero);
+
+/* ---------- ленты ---------- */
+const ribbons=$$('.ribbon').map(r=>{r.innerHTML+=r.innerHTML; return {el:r,x:0,dir:+r.dataset.dir};});
+function drawRibbons(){ const boost=clamp(Math.abs(vel),0,60); const sign=vel<0?-1:1;
+  for(const r of ribbons){ const w=r.el.scrollWidth/2; r.x+=(1.1+boost*0.35)*r.dir*sign; if(r.x<-w)r.x+=w; if(r.x>0)r.x-=w;
+    r.el.style.translate=`${r.x}px 0`; } }
+
+/* ---------- гиперпрыжок ---------- */
+const wc=$('#warp'), wx=wc.getContext('2d'); let wW=0,wH=0, wVis=false, speed=.004, target=.004, wmx=0, wmy=0;
+const WS=Array.from({length:520},()=>({x:(Math.random()-.5)*2,y:(Math.random()-.5)*2,z:Math.random(),pz:1}));
+function fitWarp(){const r=wc.getBoundingClientRect(); wW=r.width; wH=r.height; wc.width=Math.max(1,wW*DPR); wc.height=Math.max(1,wH*DPR);}
+const wb=$('#warpBtn');
+['pointerenter','focus'].forEach(e=>wb.addEventListener(e,()=>target=.05)); ['pointerleave','blur'].forEach(e=>wb.addEventListener(e,()=>target=.004));
+$('#warpBox').addEventListener('pointermove',e=>{const r=wc.getBoundingClientRect();wmx=(e.clientX-r.left)/r.width-.5;wmy=(e.clientY-r.top)/r.height-.5;});
+if('IntersectionObserver' in window) new IntersectionObserver(es=>{wVis=es[0].isIntersecting;}).observe(wc); else wVis=true;
+function drawWarp(){ if(!wVis) return; const W=wW*DPR,H=wH*DPR; speed+=(target+clamp(Math.abs(vel),0,80)*0.0004-speed)*.06;
+  wx.fillStyle=`rgba(3,8,32,${speed>.012?.3:.85})`; wx.fillRect(0,0,W,H);
+  const cx=W/2-wmx*W*.18, cy=H/2-wmy*H*.18, F=Math.max(W,H)*.5;
+  for(const s of WS){ s.pz=s.z; s.z-=reduce?0:speed; if(s.z<=.01){s.z=1;s.pz=1;s.x=(Math.random()-.5)*2;s.y=(Math.random()-.5)*2;}
+    const x=cx+s.x/s.z*F*.5, y=cy+s.y/s.z*F*.5, x0=cx+s.x/s.pz*F*.5, y0=cy+s.y/s.pz*F*.5, b=1-s.z;
+    wx.strokeStyle=b>.6?`rgba(255,255,255,${b})`:`rgba(98,198,255,${b})`; wx.lineWidth=Math.max(.6,b*2.8)*DPR;
+    wx.beginPath(); wx.moveTo(x0,y0); wx.lineTo(x,y); wx.stroke(); } }
+
+/* ---------- карточки: подсветка за курсором ---------- */
+$$('.svc').forEach(el=>el.addEventListener('pointermove',e=>{const r=el.getBoundingClientRect();el.style.setProperty('--mx',(e.clientX-r.left)+'px');el.style.setProperty('--my',(e.clientY-r.top)+'px');}));
+
+/* ---------- копирование телефона ---------- */
+$('#copyBtn').addEventListener('click',()=>{const done=()=>{const s=$('#copied');s.hidden=false;setTimeout(()=>s.hidden=true,1600);};
+  navigator.clipboard?navigator.clipboard.writeText('+7 (978) 287-31-04').then(done,()=>{}):null;});
+
+/* ---------- главный цикл ---------- */
+function frame(t){
+  rx+=(mx-rx)*.16; ry+=(my-ry)*.16; ring.style.transform=`translate(${rx}px,${ry}px)`;
+  drawText(t); if(!reduce){drawRibbons();} drawWarp();
+  if(!lenis) vel*=.9;
+  requestAnimationFrame(frame);
+}
+
+/* ---------- пересчёт размеров ---------- */
+const safe=f=>{try{f()}catch(e){console.warn(e)}};
+let rt=0;
+function fitGiant(){const g=$('#giant'); g.style.fontSize='100px'; const w=g.scrollWidth; const avail=document.documentElement.clientWidth*0.96; g.style.fontSize=Math.floor(100*avail/w)+'px';}
+function refit(){clearTimeout(rt);rt=setTimeout(()=>{DPR=Math.min(devicePixelRatio||1,2);safe(buildText);safe(fitWarp);fitGiant();hasG&&ScrollTrigger.refresh();},150);}
+addEventListener('resize',()=>{ if(!fine && Math.abs(innerWidth-(refit.w||0))<2) return; refit.w=innerWidth; refit(); });
+addEventListener('orientationchange',refit);
+refit.w=innerWidth;
+
+/* ---------- сценарии прокрутки ---------- */
+function scenes(){
+  if(!hasG||reduce) return;
+  gsap.registerPlugin(ScrollTrigger);
+  // заголовки разлетаются в буквы
+  $$('.split').forEach(h=>{ if(h.closest('#services')) return;
+    gsap.from(h.querySelectorAll('.ch'),{yPercent:120,rotate:12,opacity:0,stagger:.018,duration:1,ease:'expo.out',scrollTrigger:{trigger:h,start:'top 88%'}}); });
+  gsap.utils.toArray('.sec-head p,.print-text>p,.pnote,.plist,.cinfo,.cact,.route,.warp p').forEach(el=>
+    gsap.from(el,{y:40,opacity:0,duration:1,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 92%'}}));
+
+  // ленты проезжают навстречу
+  gsap.fromTo('.r1',{xPercent:6},{xPercent:-6,ease:'none',scrollTrigger:{trigger:'.ribbons',start:'top bottom',end:'bottom top',scrub:true}});
+  gsap.fromTo('.r2',{xPercent:-6},{xPercent:6,ease:'none',scrollTrigger:{trigger:'.ribbons',start:'top bottom',end:'bottom top',scrub:true}});
+
+  const mm=gsap.matchMedia();
+  mm.add('(min-width: 901px)',()=>{
+    // портал: синий круг раскрывается, потом лента услуг едет вбок
+    const track=$('#track'); const dist=()=>Math.max(0,track.scrollWidth-innerWidth+40);
+    const tl=gsap.timeline({scrollTrigger:{trigger:'#services',start:'top top',end:()=>'+='+(dist()+innerHeight*1.1),pin:true,scrub:1,invalidateOnRefresh:true,anticipatePin:1}});
+    tl.fromTo('.portal-bg',{clipPath:'circle(0% at 50% 50%)'},{clipPath:'circle(75% at 50% 50%)',ease:'power2.inOut',duration:.5})
+      .fromTo('#services .split .ch',{yPercent:120,rotate:10},{yPercent:0,rotate:0,stagger:.012,duration:.3,ease:'power3.out'},'-=.2')
+      .fromTo('.portal-head p',{opacity:0,y:30},{opacity:1,y:0,duration:.2},'<.1')
+      .fromTo('.svc',{x:()=>innerWidth*0.6,rotate:6,opacity:0},{x:0,rotate:0,opacity:1,stagger:.05,duration:.4,ease:'power3.out'},'<')
+      .fromTo(track,{x:0},{x:()=>-dist(),ease:'none',duration:1.6});
+
+    // печать по прокрутке
+    const pl={v:0};
+    const pt=gsap.timeline({scrollTrigger:{trigger:'#print',start:'top top',end:'+=140%',pin:true,scrub:1}});
+    pt.from('#printerImg',{x:180,rotate:6,opacity:0,duration:.25,ease:'power3.out'})
+      .from('.phud,.ptemp',{y:60,opacity:0,stagger:.05,duration:.15},'<.1')
+      .fromTo('#gclip',{attr:{y:64}},{attr:{y:0},ease:'steps(30)',duration:.6})
+      .fromTo('#pbeam',{top:'80%'},{top:'18%',ease:'none',duration:.6},'<')
+      .fromTo(pl,{v:0},{v:240,ease:'steps(30)',duration:.6,onUpdate:()=>{const v=Math.round(pl.v);$('#layerNo').textContent=`слой ${v} / 240`;$('#layerBar').style.width=(v/2.4)+'%';}},'<')
+      .from('.plist li',{scale:.4,opacity:0,stagger:.03,duration:.12},'<.1');
+
+    // стопка сборок
+    if(innerHeight>=680){
+      const cards=gsap.utils.toArray('.bcard');
+      cards.forEach((c,i)=>{ c.style.position='sticky'; c.style.top=(110+i*26)+'px';
+        if(i<cards.length-1) gsap.fromTo(c,{scale:1,filter:'brightness(1)'},{scale:.92-0.02*(cards.length-i),filter:'brightness(.88)',ease:'none',
+          scrollTrigger:{trigger:cards[i+1],start:'top bottom',end:'top '+(110+(i+1)*26)+'px',scrub:true}}); });
+      return ()=>cards.forEach(c=>{c.style.position='';c.style.top='';});
+    }
+  });
+  mm.add('(max-width: 900px)',()=>{
+    $('.pstage').classList.add('loop');
+    gsap.utils.toArray('.svc').forEach(el=>gsap.from(el,{y:70,opacity:0,rotate:3,duration:.9,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 92%'}}));
+    gsap.utils.toArray('.bcard').forEach(el=>gsap.from(el,{y:80,opacity:0,scale:.95,duration:1,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 90%'}}));
+    return ()=>$('.pstage').classList.remove('loop');
+  });
+
+  // провод по шагам
+  const vertical=()=>innerWidth<=900;
+  ScrollTrigger.create({trigger:'#stepsBox',start:'top 75%',end:'bottom 55%',scrub:true,onUpdate:s=>{
+    $('#wireFill').style.transform=vertical()?`scaleY(${s.progress})`:`scaleX(${s.progress})`;
+    $$('.step').forEach((el,i)=>el.classList.toggle('on',s.progress>=(i+.4)/4)); }});
+
+  // окно в космос раскрывается на весь экран
+  gsap.fromTo('#warpBox',{clipPath:'inset(10% 7% round 48px)'},{clipPath:'inset(0% 0% round 0px)',ease:'none',scrollTrigger:{trigger:'.warp-wrap',start:'top 95%',end:'top 5%',scrub:true}});
+  gsap.from('.warp h2',{scale:.75,ease:'none',scrollTrigger:{trigger:'.warp-wrap',start:'top 90%',end:'top 10%',scrub:true}});
+
+  // телефон и гигантское имя
+  gsap.from('#phoneBig .ch',{yPercent:100,opacity:0,stagger:.025,duration:.9,ease:'expo.out',scrollTrigger:{trigger:'#phoneBig',start:'top 90%'}});
+  gsap.from('#giant .ch',{yPercent:110,stagger:.05,duration:1.2,ease:'expo.out',scrollTrigger:{trigger:'footer',start:'top 85%'}});
+  gsap.to('.hero .wrap',{yPercent:-12,opacity:.2,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:true}});
+}
+
+/* ---------- вступление ---------- */
+function heroIn(){
+  released=true; releaseT=performance.now();
+  setTimeout(()=>$('#hdr').classList.remove('hide'),400);
+  if(hasG&&!reduce){
+    gsap.from('.hero-top>*',{y:30,opacity:0,stagger:.08,duration:.9,ease:'power3.out',delay:.5});
+    gsap.from('.hero-bottom>*',{y:50,opacity:0,stagger:.1,duration:1,ease:'power3.out',delay:.9});
+  }
+}
+function intro(){
+  const el=$('#intro');
+  if(reduce||!el||getComputedStyle(el).display==='none'){ el&&el.remove(); heroIn(); return; }
+  lenis&&lenis.stop(); $('#hdr').classList.add('hide');
+  const line=$('#introLine'), cnt=$('#introCount'), t0=performance.now(), dur=1500, full=Math.min(520,innerWidth*.76)-40;
+  const tick=t=>{ const k=clamp((t-t0)/dur,0,1), e=1-Math.pow(1-k,3);
+    line.style.width=(full*e)+'px'; cnt.textContent='ЗАПУСК '+String(Math.round(e*100)).padStart(3,'0');
+    if(k<1) requestAnimationFrame(tick);
+    else { el.classList.add('done'); setTimeout(heroIn,250); setTimeout(()=>{el.remove();lenis&&lenis.start();},1200); } };
+  requestAnimationFrame(tick);
+}
+
+/* ---------- старт ---------- */
+const fontReady=(document.fonts&&document.fonts.load)?Promise.race([document.fonts.load('400 100px "Dela Gothic One"'),new Promise(r=>setTimeout(r,2500))]):Promise.resolve();
+fontReady.then(()=>{ safe(fitGiant); safe(buildText); safe(fitWarp); safe(scenes); requestAnimationFrame(frame); safe(intro); });
+})();
+</script>
+</body>
+</html>
